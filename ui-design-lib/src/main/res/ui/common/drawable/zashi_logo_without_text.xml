@@ -1,11 +1,36 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="36dp"
-    android:height="47dp"
+    android:height="43dp"
     android:viewportWidth="36"
-    android:viewportHeight="47">
+    android:viewportHeight="43">
+  <!-- Shield outline -->
   <path
-      android:strokeWidth="1"
-      android:pathData="M19.331,33.909L24.858,45L10.45,38.564L35,25.787L33.016,18.781L2,2L22.511,27.926L33.016,18.781L10.45,38.564"
+      android:pathData="M18,1 C10,1 2,5 2,14 L2,26 C2,35 10,42 18,42 C26,42 34,35 34,26 L34,14 C34,5 26,1 18,1 Z"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="#0A141F"/>
+  <!-- Horizontal line upper -->
+  <path
+      android:pathData="M5,14 L31,14"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="#0A141F"/>
+  <!-- Diagonal top-left to bottom-right -->
+  <path
+      android:pathData="M8,6 L28,36"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="#0A141F"/>
+  <!-- Diagonal top-right to bottom-left -->
+  <path
+      android:pathData="M28,6 L8,36"
+      android:strokeWidth="2"
+      android:fillColor="#00000000"
+      android:strokeColor="#0A141F"/>
+  <!-- Horizontal line lower -->
+  <path
+      android:pathData="M8,28 L28,28"
+      android:strokeWidth="2"
       android:fillColor="#00000000"
       android:strokeColor="#0A141F"/>
 </vector>
