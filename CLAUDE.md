@@ -19,6 +19,11 @@
 - **Domain**: zolapp.xyz
 - **Fork of**: Zashi Zcash Wallet (Electric Coin Company)
 
+## Audited Files
+
+See `docs/AUDITED_FILES.md` for the full list of security-critical files inherited from Zashi.
+Do not modify listed files. Create new files instead.
+
 ## Architecture
 
 - **Pattern**: Provider → DataSource → Repository → UseCase → ViewModel
