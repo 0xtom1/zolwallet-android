@@ -8,6 +8,7 @@ import xyz.zolapp.solana.crypto.SolanaKeypairProvider
 import xyz.zolapp.solana.crypto.SolanaKeypairProviderImpl
 import xyz.zolapp.solana.datasource.SolanaDataSource
 import xyz.zolapp.solana.repository.SolanaRepository
+import xyz.zolapp.solana.rpc.SolanaHttpClientFactory
 import xyz.zolapp.solana.rpc.SolanaRpcProvider
 import xyz.zolapp.solana.usecase.GetSolanaAddressUseCase
 import xyz.zolapp.solana.usecase.GetSolanaBalanceUseCase
@@ -16,10 +17,7 @@ import xyz.zolapp.solana.usecase.ValidateSolanaAddressUseCase
 
 fun solanaModule(isTestnet: Boolean) =
     module {
-        single {
-            val rpcUrl = if (isTestnet) SolanaRpcProvider.DEVNET_RPC_URL else SolanaRpcProvider.MAINNET_RPC_URL
-            SolanaRpcProvider(rpcUrl)
-        }
+        single { SolanaRpcProvider(get<SolanaHttpClientFactory>()) }
         singleOf(::SolanaDataSource)
         singleOf(::SolanaRepository)
         factoryOf(::GetSolanaBalanceUseCase)

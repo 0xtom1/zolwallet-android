@@ -1,41 +1,55 @@
 package xyz.zolapp.solana.rpc
 
-import org.sol4k.Connection
+import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import org.sol4k.PublicKey
 import org.sol4k.Transaction
+import java.util.Base64
 
 /**
- * Wraps Sol4k [Connection] for Solana RPC calls, routed through the Zol RPC proxy.
- *
- * @param rpcUrl RPC endpoint URL. Defaults to the Zol proxy mainnet endpoint.
+ * Makes Solana JSON-RPC calls to the Zol RPC proxy via an injectable [SolanaHttpClientFactory].
+ * The factory is provided by the UI layer and may return a Tor-routed client when Tor is enabled.
+ * Sol4k is still used for key derivation, address types, and transaction signing.
  */
 class SolanaRpcProvider(
-    private val rpcUrl: String = MAINNET_RPC_URL
+    private val httpClientFactory: SolanaHttpClientFactory,
+    private val rpcUrl: String = MAINNET_RPC_URL,
 ) {
-    private val connection by lazy { Connection(rpcUrl) }
+    suspend fun getBalance(publicKey: PublicKey): Long {
+        val response = httpClientFactory.create().post(rpcUrl) {
+            contentType(ContentType.Application.Json)
+            setBody("""{"jsonrpc":"2.0","id":1,"method":"getBalance","params":["${publicKey.toBase58()}"]}""")
+        }.body<JsonObject>()
+        return response["result"]!!.jsonObject["value"]!!.jsonPrimitive.long
+    }
 
-    /**
-     * Returns the SOL balance in lamports for the given public key.
-     */
-    fun getBalance(publicKey: PublicKey): Long = connection.getBalance(publicKey).toLong()
+    suspend fun getLatestBlockhash(): String {
+        val response = httpClientFactory.create().post(rpcUrl) {
+            contentType(ContentType.Application.Json)
+            setBody("""{"jsonrpc":"2.0","id":1,"method":"getLatestBlockhash","params":[]}""")
+        }.body<JsonObject>()
+        return response["result"]!!.jsonObject["value"]!!.jsonObject["blockhash"]!!.jsonPrimitive.content
+    }
 
-    /**
-     * Returns the latest blockhash string.
-     */
-    fun getLatestBlockhash(): String = connection.getLatestBlockhash()
+    suspend fun sendTransaction(transaction: Transaction): String {
+        val serialized = Base64.getEncoder().encodeToString(transaction.serialize())
+        val response = httpClientFactory.create().post(rpcUrl) {
+            contentType(ContentType.Application.Json)
+            setBody("""{"jsonrpc":"2.0","id":1,"method":"sendTransaction","params":["$serialized",{"encoding":"base64"}]}""")
+        }.body<JsonObject>()
+        return response["result"]!!.jsonPrimitive.content
+    }
 
-    /**
-     * Sends a signed transaction and returns the transaction signature.
-     */
-    fun sendTransaction(transaction: Transaction): String = connection.sendTransaction(transaction)
-
-    /**
-     * Checks if the given address is a valid Solana public key (Base58, 32 bytes).
-     */
     fun isValidAddress(address: String): Boolean =
         try {
-            val decoded = PublicKey(address)
-            decoded.toBase58() == address
+            PublicKey(address).toBase58() == address
         } catch (_: Exception) {
             false
         }
