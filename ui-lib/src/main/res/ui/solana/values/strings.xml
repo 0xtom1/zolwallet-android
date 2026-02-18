@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Solana Receive Screen -->
+    <string name="solana_receive_title">Receive SOL</string>
+    <string name="solana_receive_address_label">Solana Address</string>
+    <string name="solana_receive_copy">Copy Address</string>
+    <string name="solana_receive_copied">Address copied</string>
+
+    <!-- Solana Send Screen -->
+    <string name="solana_send_title">Send SOL</string>
+    <string name="solana_send_to_label">To Address</string>
+    <string name="solana_send_to_hint">Solana address</string>
+    <string name="solana_send_amount_label">Amount (SOL)</string>
+    <string name="solana_send_amount_hint">0.0</string>
+    <string name="solana_send_button">Send</string>
+    <string name="solana_send_sending">Sending…</string>
+    <string name="solana_send_success">Transaction sent successfully</string>
+    <string name="solana_send_error">Failed to send transaction</string>
+    <string name="solana_send_invalid_address">Invalid Solana address</string>
+    <string name="solana_send_invalid_amount">Invalid amount</string>
+    <string name="solana_send_insufficient_balance">Insufficient balance</string>
+
+    <!-- Solana Balance -->
+    <string name="solana_balance_label">SOL Balance</string>
+    <string name="solana_balance_sol">%1$s SOL</string>
+    <string name="solana_balance_loading">Loading…</string>
+
+    <!-- Home Screen -->
+    <string name="home_button_solana_receive">Receive SOL</string>
+    <string name="home_button_solana_send">Send SOL</string>
+</resources>

@@ -42,6 +42,8 @@ import co.electriccoin.zcash.ui.fixture.ZashiMainTopAppBarStateFixture
 import co.electriccoin.zcash.ui.screen.balances.BalanceWidget
 import co.electriccoin.zcash.ui.screen.balances.BalanceWidgetState
 import co.electriccoin.zcash.ui.screen.home.error.WalletErrorMessageState
+import co.electriccoin.zcash.ui.screen.solanabalance.SolanaBalanceWidget
+import co.electriccoin.zcash.ui.screen.solanabalance.SolanaBalanceWidgetState
 import co.electriccoin.zcash.ui.screen.transactionhistory.widget.ActivityWidgetState
 import co.electriccoin.zcash.ui.screen.transactionhistory.widget.ActivityWidgetStateFixture
 import co.electriccoin.zcash.ui.screen.transactionhistory.widget.createActivityWidgets
@@ -51,7 +53,8 @@ internal fun HomeView(
     appBarState: ZashiMainTopAppBarState?,
     balanceWidgetState: BalanceWidgetState,
     transactionWidgetState: ActivityWidgetState,
-    state: HomeState
+    state: HomeState,
+    solanaBalanceWidgetState: SolanaBalanceWidgetState? = null,
 ) {
     BlankBgScaffold(
         topBar = { ZashiTopAppBarWithAccountSelection(appBarState) }
@@ -61,7 +64,8 @@ internal fun HomeView(
             paddingValues = paddingValues,
             activityWidgetState = transactionWidgetState,
             balanceWidgetState = balanceWidgetState,
-            state = state
+            state = state,
+            solanaBalanceWidgetState = solanaBalanceWidgetState
         )
     }
 }
@@ -73,6 +77,7 @@ private fun Content(
     balanceWidgetState: BalanceWidgetState,
     state: HomeState,
     modifier: Modifier = Modifier,
+    solanaBalanceWidgetState: SolanaBalanceWidgetState? = null,
 ) {
     Box(
         modifier = modifier,
@@ -90,6 +95,18 @@ private fun Content(
                         ),
                 state = balanceWidgetState,
             )
+            if (solanaBalanceWidgetState != null) {
+                Spacer(8.dp)
+                SolanaBalanceWidget(
+                    state = solanaBalanceWidgetState,
+                    modifier =
+                        Modifier
+                            .padding(
+                                start = ZcashTheme.dimens.screenHorizontalSpacingRegular,
+                                end = ZcashTheme.dimens.screenHorizontalSpacingRegular,
+                            ),
+                )
+            }
             Spacer(16.dp)
             NavButtons(
                 modifier =

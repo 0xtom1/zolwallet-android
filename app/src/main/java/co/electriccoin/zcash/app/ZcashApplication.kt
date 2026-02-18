@@ -13,7 +13,9 @@ import co.electriccoin.zcash.di.metadataModule
 import co.electriccoin.zcash.di.providerModule
 import co.electriccoin.zcash.di.repositoryModule
 import co.electriccoin.zcash.di.useCaseModule
+import co.electriccoin.zcash.di.solanaViewModelModule
 import co.electriccoin.zcash.di.viewModelModule
+import xyz.zolapp.solana.di.solanaModule
 import co.electriccoin.zcash.spackle.StrictModeCompat
 import co.electriccoin.zcash.spackle.Twig
 import co.electriccoin.zcash.ui.common.provider.CrashReportingStorageProvider
@@ -64,7 +66,9 @@ class ZcashApplication : CoroutineApplication() {
                 metadataModule,
                 useCaseModule,
                 mapperModule,
-                viewModelModule
+                viewModelModule,
+                solanaModule(isTestnet = packageName.endsWith(".testnet")),
+                solanaViewModelModule
             )
         }
 

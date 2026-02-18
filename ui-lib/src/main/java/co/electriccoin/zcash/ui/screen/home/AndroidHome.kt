@@ -10,6 +10,7 @@ import co.electriccoin.zcash.ui.common.appbar.ZashiTopAppBarVM
 import co.electriccoin.zcash.ui.screen.balances.BalanceWidgetArgs
 import co.electriccoin.zcash.ui.screen.balances.BalanceWidgetVM
 import co.electriccoin.zcash.ui.screen.restoresuccess.WrapRestoreSuccess
+import co.electriccoin.zcash.ui.screen.solanabalance.SolanaBalanceWidgetVM
 import co.electriccoin.zcash.ui.screen.transactionhistory.widget.ActivityWidgetVM
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
@@ -30,19 +31,22 @@ internal fun AndroidHome() {
         }
     val homeVM = koinViewModel<HomeVM>()
     val activityWidgetVM = koinViewModel<ActivityWidgetVM>()
+    val solanaBalanceWidgetVM = koinViewModel<SolanaBalanceWidgetVM>()
     val restoreDialogState by homeVM.restoreDialogState.collectAsStateWithLifecycle()
     val appBarState by topAppBarVM.state.collectAsStateWithLifecycle()
     val balanceState by balanceWidgetVM.state.collectAsStateWithLifecycle()
     val state by homeVM.state.collectAsStateWithLifecycle()
     homeVM.uiLifecyclePipeline.collectAsStateWithLifecycle()
     val transactionWidgetState by activityWidgetVM.state.collectAsStateWithLifecycle()
+    val solanaBalanceState by solanaBalanceWidgetVM.state.collectAsStateWithLifecycle()
 
     state?.let {
         HomeView(
             appBarState = appBarState,
             balanceWidgetState = balanceState,
             state = it,
-            transactionWidgetState = transactionWidgetState
+            transactionWidgetState = transactionWidgetState,
+            solanaBalanceWidgetState = solanaBalanceState
         )
     }
 

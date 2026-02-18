@@ -223,6 +223,7 @@ dependencies {
     implementation(projects.preferenceImplAndroidLib)
     implementation(projects.spackleAndroidLib)
     implementation(projects.uiLib)
+    implementation(projects.solanaLib)
 
     androidTestImplementation(projects.testLib)
 

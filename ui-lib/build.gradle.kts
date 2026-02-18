@@ -88,6 +88,7 @@ android {
                     "src/main/res/ui/whats_new",
                     "src/main/res/ui/exchange_rate",
                     "src/main/res/ui/tor",
+                    "src/main/res/ui/solana",
                 )
             )
         }
@@ -199,6 +200,8 @@ dependencies {
     api(libs.bundles.androidx.biometric)
 
     api(libs.keystone)
+
+    implementation(projects.solanaLib)
 
     androidTestImplementation(projects.testLib)
     androidTestImplementation(libs.bundles.androidx.test)

@@ -119,6 +119,10 @@ import co.electriccoin.zcash.ui.screen.selectkeystoneaccount.AndroidSelectKeysto
 import co.electriccoin.zcash.ui.screen.selectkeystoneaccount.SelectKeystoneAccount
 import co.electriccoin.zcash.ui.screen.send.Send
 import co.electriccoin.zcash.ui.screen.send.WrapSend
+import co.electriccoin.zcash.ui.screen.solanareceive.SolanaReceiveArgs
+import co.electriccoin.zcash.ui.screen.solanareceive.SolanaReceiveScreen
+import co.electriccoin.zcash.ui.screen.solanasend.SolanaSendArgs
+import co.electriccoin.zcash.ui.screen.solanasend.SolanaSendScreen
 import co.electriccoin.zcash.ui.screen.signkeystonetransaction.SignKeystoneTransactionArgs
 import co.electriccoin.zcash.ui.screen.signkeystonetransaction.SignKeystoneTransactionScreen
 import co.electriccoin.zcash.ui.screen.swap.SwapArgs
@@ -275,6 +279,8 @@ fun NavGraphBuilder.walletNavGraph(
         dialogComposable<EphemeralHotfixArgs> { EphemeralHotfixScreen(it.toRoute()) }
         dialogComposable<EnhancementHotfixArgs> { EnhancementHotfixScreen() }
         dialogComposable<EphemeralLockArgs> { EphemeralLockScreen() }
+        composable<SolanaSendArgs> { SolanaSendScreen() }
+        composable<SolanaReceiveArgs> { SolanaReceiveScreen() }
         composable<DebugArgs> { DebugScreen() }
         composable<DebugDBArgs> { DebugDBScreen() }
         dialogComposable<DebugTextArgs> { DebugTextScreen(it.toRoute()) }
