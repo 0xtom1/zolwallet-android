@@ -1,30 +1,11 @@
-import java.util.Properties
-
 plugins {
     id("com.android.library")
     kotlin("android")
     id("secant.android-build-conventions")
 }
 
-val localProperties = Properties().apply {
-    val file = rootProject.file("local.properties")
-    if (file.exists()) load(file.inputStream())
-}
-
 android {
     namespace = "xyz.zolapp.solana"
-
-    buildFeatures {
-        buildConfig = true
-    }
-
-    defaultConfig {
-        buildConfigField(
-            "String",
-            "HELIUS_API_KEY",
-            "\"${localProperties.getProperty("HELIUS_API_KEY", "")}\""
-        )
-    }
 }
 
 dependencies {

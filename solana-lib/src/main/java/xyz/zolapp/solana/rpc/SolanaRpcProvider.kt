@@ -3,12 +3,11 @@ package xyz.zolapp.solana.rpc
 import org.sol4k.Connection
 import org.sol4k.PublicKey
 import org.sol4k.Transaction
-import xyz.zolapp.solana.BuildConfig
 
 /**
- * Wraps Sol4k [Connection] for Solana RPC calls.
+ * Wraps Sol4k [Connection] for Solana RPC calls, routed through the Zol RPC proxy.
  *
- * @param rpcUrl RPC endpoint URL. Defaults to mainnet.
+ * @param rpcUrl RPC endpoint URL. Defaults to the Zol proxy mainnet endpoint.
  */
 class SolanaRpcProvider(
     private val rpcUrl: String = MAINNET_RPC_URL
@@ -42,8 +41,6 @@ class SolanaRpcProvider(
         }
 
     companion object {
-        private val HELIUS_API_KEY = BuildConfig.HELIUS_API_KEY
-        val MAINNET_RPC_URL = "https://mainnet.helius-rpc.com/?api-key=$HELIUS_API_KEY"
-        val DEVNET_RPC_URL = "https://devnet.helius-rpc.com/?api-key=$HELIUS_API_KEY"
+        const val MAINNET_RPC_URL = "https://wallet-api-5arl64l7ia-uc.a.run.app/helius"
     }
 }
