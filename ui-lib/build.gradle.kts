@@ -202,6 +202,7 @@ dependencies {
     api(libs.keystone)
 
     implementation(projects.solanaLib)
+    implementation(projects.marketLib)
 
     androidTestImplementation(projects.testLib)
     androidTestImplementation(libs.bundles.androidx.test)

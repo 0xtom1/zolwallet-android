@@ -15,6 +15,7 @@ import co.electriccoin.zcash.di.repositoryModule
 import co.electriccoin.zcash.di.useCaseModule
 import co.electriccoin.zcash.di.solanaViewModelModule
 import co.electriccoin.zcash.di.viewModelModule
+import xyz.zolapp.market.di.marketModule
 import xyz.zolapp.solana.di.solanaModule
 import co.electriccoin.zcash.spackle.StrictModeCompat
 import co.electriccoin.zcash.spackle.Twig
@@ -68,6 +69,7 @@ class ZcashApplication : CoroutineApplication() {
                 mapperModule,
                 viewModelModule,
                 solanaModule(isTestnet = packageName.endsWith(".testnet")),
+                marketModule,
                 solanaViewModelModule
             )
         }

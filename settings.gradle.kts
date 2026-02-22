@@ -376,6 +376,7 @@ include("ui-integration-test")
 include("ui-lib")
 include("ui-screenshot-test")
 include("solana-lib")
+include("market-lib")
 
 val zcashSdkIncludedBuildPath = extra["SDK_INCLUDED_BUILD_PATH"].toString()
 

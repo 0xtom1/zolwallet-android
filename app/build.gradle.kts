@@ -224,6 +224,7 @@ dependencies {
     implementation(projects.spackleAndroidLib)
     implementation(projects.uiLib)
     implementation(projects.solanaLib)
+    implementation(projects.marketLib)
 
     androidTestImplementation(projects.testLib)
 

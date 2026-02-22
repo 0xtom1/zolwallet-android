@@ -4,12 +4,14 @@ import cash.z.ecc.android.bip39.Mnemonics
 import cash.z.ecc.android.bip39.toSeed
 import co.electriccoin.zcash.ui.common.provider.HttpClientProvider
 import co.electriccoin.zcash.ui.common.provider.PersistableWalletProvider
+import co.electriccoin.zcash.ui.screen.home.tokenlist.TokenListVM
 import co.electriccoin.zcash.ui.screen.solanabalance.SolanaBalanceWidgetVM
 import co.electriccoin.zcash.ui.screen.solanareceive.SolanaReceiveVM
 import co.electriccoin.zcash.ui.screen.solanasend.SolanaSendViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import xyz.zolapp.market.network.MarketHttpClientFactory
 import xyz.zolapp.solana.crypto.SolanaKeypairProvider
 import xyz.zolapp.solana.crypto.SolanaKeypairProviderImpl
 import xyz.zolapp.solana.rpc.SolanaHttpClientFactory
@@ -20,6 +22,14 @@ val solanaViewModelModule =
         single<SolanaHttpClientFactory> {
             val httpClientProvider = get<HttpClientProvider>()
             object : SolanaHttpClientFactory {
+                override suspend fun create() = httpClientProvider.create()
+            }
+        }
+
+        // Bridge: HttpClientProvider → MarketHttpClientFactory (Tor-aware when enabled)
+        single<MarketHttpClientFactory> {
+            val httpClientProvider = get<HttpClientProvider>()
+            object : MarketHttpClientFactory {
                 override suspend fun create() = httpClientProvider.create()
             }
         }
@@ -37,4 +47,5 @@ val solanaViewModelModule =
         viewModelOf(::SolanaSendViewModel)
         viewModelOf(::SolanaReceiveVM)
         viewModelOf(::SolanaBalanceWidgetVM)
+        viewModelOf(::TokenListVM)
     }
