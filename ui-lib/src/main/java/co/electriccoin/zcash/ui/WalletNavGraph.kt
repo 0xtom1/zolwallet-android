@@ -28,6 +28,10 @@ import co.electriccoin.zcash.ui.screen.balances.spendable.SpendableBalanceArgs
 import co.electriccoin.zcash.ui.screen.balances.spendable.SpendableBalanceScreen
 import co.electriccoin.zcash.ui.screen.chooseserver.ChooseServerArgs
 import co.electriccoin.zcash.ui.screen.chooseserver.ChooseServerScreen
+import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonArgs
+import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonScreen
+import co.electriccoin.zcash.ui.screen.wallets.WalletsArgs
+import co.electriccoin.zcash.ui.screen.wallets.WalletsScreen
 import co.electriccoin.zcash.ui.screen.connectkeystone.AndroidConnectKeystone
 import co.electriccoin.zcash.ui.screen.connectkeystone.ConnectKeystone
 import co.electriccoin.zcash.ui.screen.contact.AddGenericABContactArgs
@@ -281,6 +285,8 @@ fun NavGraphBuilder.walletNavGraph(
         dialogComposable<EphemeralLockArgs> { EphemeralLockScreen() }
         composable<SolanaSendArgs> { SolanaSendScreen() }
         composable<SolanaReceiveArgs> { SolanaReceiveScreen() }
+        composable<ComingSoonArgs> { ComingSoonScreen() }
+        composable<WalletsArgs> { WalletsScreen() }
         composable<DebugArgs> { DebugScreen() }
         composable<DebugDBArgs> { DebugDBScreen() }
         dialogComposable<DebugTextArgs> { DebugTextScreen(it.toRoute()) }

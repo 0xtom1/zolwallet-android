@@ -9,10 +9,11 @@ import org.sol4k.instruction.TransferInstruction
 import xyz.zolapp.solana.crypto.SolanaKeypairProvider
 import xyz.zolapp.solana.datasource.SolanaAccountInfo
 import xyz.zolapp.solana.datasource.SolanaDataSource
+import xyz.zolapp.solana.model.SplTokenInfo
 import xyz.zolapp.solana.rpc.SolanaRpcProvider
 
 /**
- * Repository for Solana wallet operations: balance, send, address.
+ * Repository for Solana wallet operations: balance, tokens, send, address.
  */
 class SolanaRepository(
     private val keypairProvider: SolanaKeypairProvider,
@@ -25,36 +26,61 @@ class SolanaRepository(
     val accountInfo: StateFlow<SolanaAccountInfo?> = dataSource.accountInfo
 
     /**
+     * Observable SPL token list from Helius DAS API.
+     */
+    val splTokens: StateFlow<List<SplTokenInfo>> = dataSource.splTokens
+
+    /**
+     * Observable native SOL token info with price data from Helius DAS API.
+     */
+    val solTokenInfo: StateFlow<SplTokenInfo?> = dataSource.solTokenInfo
+
+    /**
      * Observable error state.
      */
     val error: StateFlow<Throwable?> = dataSource.error
 
     /**
      * Returns the Solana wallet address.
+     *
+     * @param accountIndex the account index for key derivation
      */
-    suspend fun getAddress(): String = keypairProvider.getAddress()
+    suspend fun getAddress(accountIndex: Int = 0): String =
+        keypairProvider.getAddress(accountIndex)
 
     /**
-     * Starts background balance polling.
+     * Fetches all token data (SOL balance, SPL tokens, prices).
+     * Call on screen load or user-triggered refresh.
+     *
+     * @param accountIndex the account index for key derivation
      */
-    fun startBalancePolling() = dataSource.startPolling()
+    suspend fun fetchTokenData(accountIndex: Int = 0) =
+        dataSource.fetchTokenData(accountIndex)
 
     /**
-     * Refreshes the balance once.
+     * Fetches only the native SOL balance.
+     *
+     * @param accountIndex the account index for key derivation
      */
-    suspend fun refreshBalance() = dataSource.refreshBalance()
+    suspend fun refreshBalance(accountIndex: Int = 0) =
+        dataSource.refreshBalance(accountIndex)
 
     /**
      * Sends SOL to the given recipient.
      *
      * @param recipientAddress Base58 Solana address
      * @param lamports amount in lamports (1 SOL = 1_000_000_000 lamports)
+     * @param accountIndex the account index for key derivation
      * @return Result containing the transaction signature on success
      */
-    suspend fun sendSol(recipientAddress: String, lamports: Long): Result<String> =
+    suspend fun sendSol(
+        recipientAddress: String,
+        lamports: Long,
+        accountIndex: Int = 0,
+    ): Result<String> =
         withContext(Dispatchers.IO) {
             runCatching {
-                val keypair = keypairProvider.getKeypair()
+                val keypair = keypairProvider.getKeypair(accountIndex)
                 val fromPublicKey = keypair.publicKey
                 val toPublicKey = PublicKey(recipientAddress)
                 val blockhash = rpcProvider.getLatestBlockhash()

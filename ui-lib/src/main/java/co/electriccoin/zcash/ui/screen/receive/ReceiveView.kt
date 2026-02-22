@@ -211,10 +211,12 @@ private fun AddressPanel(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ZashiImageButton(
-                modifier = Modifier.size(32.dp),
-                state = state.infoIconButton,
-            )
+            if (state.infoIconButton != null) {
+                ZashiImageButton(
+                    modifier = Modifier.size(32.dp),
+                    state = state.infoIconButton,
+                )
+            }
         }
 
         AnimatedVisibility(visible = state.isExpanded) {
@@ -225,7 +227,7 @@ private fun AddressPanel(
                         .fillMaxWidth()
                         .padding(top = ZcashTheme.dimens.spacingDefault)
             ) {
-                if (state.isShielded) {
+                if (state.showCopy) {
                     ReceiveIconButton(
                         containerColor = buttonColor,
                         contentColor = buttonTextColor,
@@ -247,16 +249,18 @@ private fun AddressPanel(
                     modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.width(ZcashTheme.dimens.spacingSmall))
+                if (state.showRequest) {
+                    Spacer(modifier = Modifier.width(ZcashTheme.dimens.spacingSmall))
 
-                ReceiveIconButton(
-                    containerColor = buttonColor,
-                    contentColor = buttonTextColor,
-                    iconPainter = painterResource(id = R.drawable.ic_request_shielded),
-                    onClick = state.onRequestClicked,
-                    text = stringResource(id = R.string.receive_request),
-                    modifier = Modifier.weight(1f)
-                )
+                    ReceiveIconButton(
+                        containerColor = buttonColor,
+                        contentColor = buttonTextColor,
+                        iconPainter = painterResource(id = R.drawable.ic_request_shielded),
+                        onClick = state.onRequestClicked,
+                        text = stringResource(id = R.string.receive_request),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }

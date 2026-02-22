@@ -8,5 +8,5 @@ import xyz.zolapp.solana.repository.SolanaRepository
 class GetSolanaAddressUseCase(
     private val repository: SolanaRepository
 ) {
-    suspend operator fun invoke(): String = repository.getAddress()
+    suspend operator fun invoke(accountIndex: Int = 0): String = repository.getAddress(accountIndex)
 }

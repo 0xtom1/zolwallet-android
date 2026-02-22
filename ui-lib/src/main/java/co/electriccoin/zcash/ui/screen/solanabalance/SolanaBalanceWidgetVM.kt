@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.sdk.ANDROID_STATE_FLOW_TIMEOUT
 import co.electriccoin.zcash.ui.NavigationRouter
+import co.electriccoin.zcash.ui.common.datasource.SolanaWalletDataSource
 import co.electriccoin.zcash.ui.screen.solanareceive.SolanaReceiveArgs
 import co.electriccoin.zcash.ui.screen.solanasend.SolanaSendArgs
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -23,12 +26,17 @@ data class SolanaBalanceWidgetState(
 )
 
 class SolanaBalanceWidgetVM(
-    solanaRepository: SolanaRepository,
+    private val solanaRepository: SolanaRepository,
     private val navigationRouter: NavigationRouter,
+    private val solanaWalletDataSource: SolanaWalletDataSource,
 ) : ViewModel() {
 
     init {
-        solanaRepository.startBalancePolling()
+        viewModelScope.launch {
+            solanaWalletDataSource.selectedAccountIndex.collectLatest { index ->
+                solanaRepository.fetchTokenData(index)
+            }
+        }
     }
 
     val state: StateFlow<SolanaBalanceWidgetState> =

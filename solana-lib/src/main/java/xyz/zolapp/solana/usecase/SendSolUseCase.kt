@@ -13,6 +13,6 @@ class SendSolUseCase(
      * @param lamports amount in lamports (1 SOL = 1_000_000_000 lamports)
      * @return Result containing the transaction signature
      */
-    suspend operator fun invoke(recipientAddress: String, lamports: Long): Result<String> =
-        repository.sendSol(recipientAddress, lamports)
+    suspend operator fun invoke(recipientAddress: String, lamports: Long, accountIndex: Int = 0): Result<String> =
+        repository.sendSol(recipientAddress, lamports, accountIndex)
 }

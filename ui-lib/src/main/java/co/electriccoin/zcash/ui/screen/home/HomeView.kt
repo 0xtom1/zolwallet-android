@@ -1,232 +1,201 @@
 package co.electriccoin.zcash.ui.screen.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.unit.sp
 import co.electriccoin.zcash.ui.R
 import co.electriccoin.zcash.ui.common.appbar.ZashiMainTopAppBarState
 import co.electriccoin.zcash.ui.common.appbar.ZashiTopAppBarWithAccountSelection
 import co.electriccoin.zcash.ui.design.component.BigIconButtonState
 import co.electriccoin.zcash.ui.design.component.BlankBgScaffold
-import co.electriccoin.zcash.ui.design.component.Spacer
-import co.electriccoin.zcash.ui.design.component.ZashiBigIconButton
 import co.electriccoin.zcash.ui.design.newcomponent.PreviewScreens
 import co.electriccoin.zcash.ui.design.theme.ZcashTheme
+import co.electriccoin.zcash.ui.design.theme.colors.ZashiColors
 import co.electriccoin.zcash.ui.design.theme.dimensions.ZashiDimensions
-import co.electriccoin.zcash.ui.design.util.scaffoldPadding
+import co.electriccoin.zcash.ui.design.util.getValue
 import co.electriccoin.zcash.ui.design.util.stringRes
-import co.electriccoin.zcash.ui.fixture.BalanceStateFixture
 import co.electriccoin.zcash.ui.fixture.ZashiMainTopAppBarStateFixture
-import co.electriccoin.zcash.ui.screen.balances.BalanceWidget
-import co.electriccoin.zcash.ui.screen.balances.BalanceWidgetState
+import co.electriccoin.zcash.ui.screen.home.bottomnav.BottomNavTab
+import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBar
+import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBarState
 import co.electriccoin.zcash.ui.screen.home.error.WalletErrorMessageState
-import co.electriccoin.zcash.ui.screen.solanabalance.SolanaBalanceWidget
-import co.electriccoin.zcash.ui.screen.solanabalance.SolanaBalanceWidgetState
-import co.electriccoin.zcash.ui.screen.transactionhistory.widget.ActivityWidgetState
-import co.electriccoin.zcash.ui.screen.transactionhistory.widget.ActivityWidgetStateFixture
-import co.electriccoin.zcash.ui.screen.transactionhistory.widget.createActivityWidgets
+import co.electriccoin.zcash.ui.screen.home.tokenlist.TokenListState
+import co.electriccoin.zcash.ui.screen.home.tokenlist.TokenRowState
+import co.electriccoin.zcash.ui.screen.home.tokenlist.tokenListItems
 
 @Composable
 internal fun HomeView(
     appBarState: ZashiMainTopAppBarState?,
-    balanceWidgetState: BalanceWidgetState,
-    transactionWidgetState: ActivityWidgetState,
     state: HomeState,
-    solanaBalanceWidgetState: SolanaBalanceWidgetState? = null,
+    tokenListState: TokenListState,
+    bottomNavState: ZolBottomNavBarState,
 ) {
     BlankBgScaffold(
-        topBar = { ZashiTopAppBarWithAccountSelection(appBarState) }
+        topBar = { ZashiTopAppBarWithAccountSelection(appBarState) },
+        bottomBar = { ZolBottomNavBar(bottomNavState) }
     ) { paddingValues ->
         Content(
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding() + ZashiDimensions.Spacing.spacingLg),
             paddingValues = paddingValues,
-            activityWidgetState = transactionWidgetState,
-            balanceWidgetState = balanceWidgetState,
             state = state,
-            solanaBalanceWidgetState = solanaBalanceWidgetState
+            tokenListState = tokenListState,
         )
     }
 }
 
 @Composable
 private fun Content(
-    activityWidgetState: ActivityWidgetState,
     paddingValues: PaddingValues,
-    balanceWidgetState: BalanceWidgetState,
     state: HomeState,
+    tokenListState: TokenListState,
     modifier: Modifier = Modifier,
-    solanaBalanceWidgetState: SolanaBalanceWidgetState? = null,
 ) {
-    Box(
-        modifier = modifier,
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding())
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(8.dp)
-            BalanceWidget(
-                modifier =
-                    Modifier
-                        .padding(
-                            start = ZcashTheme.dimens.screenHorizontalSpacingRegular,
-                            end = ZcashTheme.dimens.screenHorizontalSpacingRegular,
-                        ),
-                state = balanceWidgetState,
-            )
-            if (solanaBalanceWidgetState != null) {
-                Spacer(8.dp)
-                SolanaBalanceWidget(
-                    state = solanaBalanceWidgetState,
-                    modifier =
-                        Modifier
-                            .padding(
-                                start = ZcashTheme.dimens.screenHorizontalSpacingRegular,
-                                end = ZcashTheme.dimens.screenHorizontalSpacingRegular,
-                            ),
+        // Portfolio header (total USD)
+        item(key = "portfolio_header") {
+            PortfolioHeader(
+                totalUsd = tokenListState.totalPortfolioUsd,
+                modifier = Modifier.padding(
+                    start = ZcashTheme.dimens.screenHorizontalSpacingRegular,
+                    end = ZcashTheme.dimens.screenHorizontalSpacingRegular,
                 )
-            }
-            Spacer(16.dp)
-            NavButtons(
-                modifier =
-                    Modifier
-                        .zIndex(1f)
-                        .offset(y = 8.dp),
-                paddingValues = paddingValues,
-                state = state
             )
-            Spacer(Modifier.height(2.dp))
-            OverlappingBoxes {
-                HomeMessage(
-                    modifier =
-                        Modifier
-                            .zIndex(0f),
-                    state = state.message
-                )
-                LazyColumn(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
-                    contentPadding = PaddingValues(top = 24.dp)
-                ) {
-                    createActivityWidgets(
-                        state = activityWidgetState
-                    )
-                }
-            }
         }
+
+        // Nav buttons (Receive, Send)
+        item(key = "nav_buttons") {
+            Spacer(Modifier.height(12.dp))
+            NavButtons(state = state)
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // Home message (syncing, restoring, backup, etc.)
+        item(key = "home_message") {
+            HomeMessage(
+                state = state.message,
+                modifier = Modifier.padding(
+                    start = ZcashTheme.dimens.screenHorizontalSpacingRegular,
+                    end = ZcashTheme.dimens.screenHorizontalSpacingRegular,
+                )
+            )
+        }
+
+        item(key = "token_list_spacer") {
+            Spacer(Modifier.height(8.dp))
+        }
+
+        // Token list
+        tokenListItems(state = tokenListState)
     }
 }
 
 @Composable
-private fun OverlappingBoxes(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val density = LocalDensity.current
-    val overlapPx by remember { mutableIntStateOf(with(density) { 24.dp.toPx().toInt() }) }
-
-    Layout(
-        modifier = modifier,
-        content = content,
-    ) { measurables, constraints ->
-        val firstBox = measurables.getOrNull(0)
-        val secondBox = measurables.getOrNull(1)
-        val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
-        val firstPlaceable = firstBox?.measure(looseConstraints)
-        val secondPlaceable = secondBox?.measure(looseConstraints)
-        layout(
-            width = constraints.maxWidth,
-            height = constraints.maxHeight
-        ) {
-            firstPlaceable?.placeRelative(
-                x = 0,
-                y = 0,
-            )
-            secondPlaceable?.placeRelative(
-                x = 0,
-                y = ((firstPlaceable?.height ?: 0) - overlapPx).coerceAtLeast(0),
-            )
-        }
+private fun PortfolioHeader(
+    totalUsd: String?,
+    modifier: Modifier = Modifier,
+) {
+    if (totalUsd != null) {
+        Text(
+            text = totalUsd,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            style = ZcashTheme.extendedTypography.balanceWidgetStyles.first,
+            color = ZashiColors.Text.textPrimary,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
-@Suppress("MagicNumber")
 @Composable
 private fun NavButtons(
-    paddingValues: PaddingValues,
     state: HomeState,
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.scaffoldPadding(paddingValues, top = 0.dp, bottom = 0.dp),
-        horizontalArrangement = Arrangement.spacedBy(9.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = ZcashTheme.dimens.screenHorizontalSpacingRegular),
+        horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
     ) {
-        ZashiBigIconButton(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .minHeight106Percent()
-                    .testTag(HomeTags.RECEIVE),
-            state = state.firstButton,
+        CompactNavButton(
+            icon = state.firstButton.icon,
+            label = state.firstButton.text.getValue(),
+            onClick = state.firstButton.onClick,
+            modifier = Modifier.testTag(HomeTags.RECEIVE),
         )
-        ZashiBigIconButton(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .minHeight106Percent()
-                    .testTag(HomeTags.SEND),
-            state = state.secondButton,
-        )
-        ZashiBigIconButton(
-            modifier =
-                Modifier
-                    .minHeight106Percent()
-                    .weight(1f),
-            state = state.thirdButton,
-        )
-        ZashiBigIconButton(
-            modifier =
-                Modifier
-                    .minHeight106Percent()
-                    .weight(1f),
-            state = state.fourthButton,
+        CompactNavButton(
+            icon = state.secondButton.icon,
+            label = state.secondButton.text.getValue(),
+            onClick = state.secondButton.onClick,
+            modifier = Modifier.testTag(HomeTags.SEND),
         )
     }
 }
 
-@Suppress("MagicNumber")
-fun Modifier.minHeight106Percent(): Modifier =
-    layout { measurable, constraints ->
-        val placeable = measurable.measure(constraints)
-        val minHeight = (placeable.width.toFloat() / (106f / 100f)).toInt()
-
-        val newConstraints = constraints.copy(minHeight = minHeight.coerceAtMost(constraints.maxHeight))
-        val newPlaceable = measurable.measure(newConstraints)
-
-        layout(newPlaceable.width, newPlaceable.height) {
-            newPlaceable.place(0, 0)
+@Composable
+private fun CompactNavButton(
+    icon: Int,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(ZashiColors.Surfaces.bgSecondary)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = label,
+                tint = ZashiColors.Text.textPrimary,
+                modifier = Modifier.size(24.dp),
+            )
         }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = label,
+            color = ZashiColors.Text.textPrimary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+        )
     }
+}
 
 @PreviewScreens
 @Composable
@@ -234,36 +203,56 @@ private fun Preview() {
     ZcashTheme {
         HomeView(
             appBarState = ZashiMainTopAppBarStateFixture.new(),
-            balanceWidgetState = BalanceStateFixture.new(),
-            transactionWidgetState = ActivityWidgetStateFixture.new(),
             state =
                 HomeState(
                     firstButton =
                         BigIconButtonState(
-                            text = stringRes("Text"),
+                            text = stringRes("Receive"),
                             icon = R.drawable.ic_home_receive,
                             onClick = {}
                         ),
                     secondButton =
                         BigIconButtonState(
-                            text = stringRes("Text"),
+                            text = stringRes("Send"),
                             icon = R.drawable.ic_home_send,
                             onClick = {}
                         ),
-                    thirdButton =
-                        BigIconButtonState(
-                            text = stringRes("Text"),
-                            icon = R.drawable.ic_home_scan,
-                            onClick = {}
-                        ),
-                    fourthButton =
-                        BigIconButtonState(
-                            text = stringRes("Text"),
-                            icon = R.drawable.ic_home_buy,
-                            onClick = {}
-                        ),
                     message = WalletErrorMessageState(onClick = {})
-                )
+                ),
+            tokenListState =
+                TokenListState(
+                    tokens = listOf(
+                        TokenRowState(
+                            id = "ZEC",
+                            iconRes = R.drawable.ic_token_zec,
+                            iconUrl = null,
+                            name = "Zcash",
+                            ticker = "ZEC",
+                            balance = "1.5",
+                            usdValue = "$45.00",
+                        ),
+                        TokenRowState(
+                            id = "SOL",
+                            iconRes = R.drawable.ic_token_sol,
+                            iconUrl = null,
+                            name = "Solana",
+                            ticker = "SOL",
+                            balance = "2.0",
+                            usdValue = "$300.00",
+                        ),
+                    ),
+                    totalPortfolioUsd = "$345.00",
+                    isLoading = false,
+                ),
+            bottomNavState =
+                ZolBottomNavBarState(
+                    selectedTab = BottomNavTab.PORTFOLIO,
+                    onPortfolioClick = {},
+                    onWalletsClick = {},
+                    onBridgeClick = {},
+                    onSwapClick = {},
+                    onPayClick = {},
+                ),
         )
     }
 }

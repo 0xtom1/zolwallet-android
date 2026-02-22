@@ -7,7 +7,6 @@ import cash.z.ecc.sdk.ANDROID_STATE_FLOW_TIMEOUT
 import co.electriccoin.zcash.preference.StandardPreferenceProvider
 import co.electriccoin.zcash.preference.model.entry.BooleanPreferenceDefault
 import co.electriccoin.zcash.ui.NavigationRouter
-import co.electriccoin.zcash.ui.common.model.DistributionDimension
 import co.electriccoin.zcash.ui.common.model.KeystoneAccount
 import co.electriccoin.zcash.ui.common.model.WalletAccount
 import co.electriccoin.zcash.ui.common.model.ZashiAccount
@@ -19,7 +18,6 @@ import co.electriccoin.zcash.ui.design.component.IconButtonState
 import co.electriccoin.zcash.ui.design.util.stringRes
 import co.electriccoin.zcash.ui.preference.StandardPreferenceKeys
 import co.electriccoin.zcash.ui.screen.accountlist.AccountList
-import co.electriccoin.zcash.ui.screen.integrations.IntegrationsArgs
 import co.electriccoin.zcash.ui.screen.more.MoreArgs
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -107,20 +105,9 @@ class ZashiTopAppBarVM(
 
     private fun onAccountTypeClicked() = navigationRouter.forward(AccountList)
 
-    private fun onInfoClick(accounts: List<WalletAccount>?) =
-        viewModelScope.launch {
-            if (getVersionInfo().distribution == DistributionDimension.FOSS) {
-                val isFlexaAvailable = configurationRepository.isFlexaAvailable()
-                val isKSConnected = accounts.orEmpty().any { it is KeystoneAccount }
-                if (!isFlexaAvailable && isKSConnected) {
-                    navigationRouter.forward(MoreArgs)
-                } else {
-                    navigationRouter.forward(IntegrationsArgs)
-                }
-            } else {
-                navigationRouter.forward(IntegrationsArgs)
-            }
-        }
+    private fun onInfoClick(
+        @Suppress("UNUSED_PARAMETER") accounts: List<WalletAccount>?
+    ) = navigationRouter.forward(MoreArgs)
 
     private fun onShowOrHideBalancesClicked() =
         viewModelScope.launch {

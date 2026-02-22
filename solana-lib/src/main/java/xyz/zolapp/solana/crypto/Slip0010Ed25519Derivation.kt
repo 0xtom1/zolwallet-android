@@ -18,19 +18,16 @@ object Slip0010Ed25519Derivation {
     private const val KEY_LENGTH = 32
 
     /**
-     * Solana BIP-44 derivation path: m/44'/501'/0'/0'
-     */
-    private val SOLANA_PATH = intArrayOf(44, 501, 0, 0)
-
-    /**
      * Derives a 32-byte Ed25519 private key from BIP39 seed bytes
-     * using the standard Solana derivation path m/44'/501'/0'/0'.
+     * using the Solana BIP-44 derivation path m/44'/501'/{accountIndex}'/0'.
      *
      * @param seed BIP39 seed bytes (typically 64 bytes)
+     * @param accountIndex the account index in the derivation path (default 0)
      * @return 32-byte private key suitable for Ed25519 signing
      */
-    fun deriveSolanaPrivateKey(seed: ByteArray): ByteArray {
-        return deriveKey(seed, SOLANA_PATH)
+    fun deriveSolanaPrivateKey(seed: ByteArray, accountIndex: Int = 0): ByteArray {
+        val path = intArrayOf(44, 501, accountIndex, 0)
+        return deriveKey(seed, path)
     }
 
     /**

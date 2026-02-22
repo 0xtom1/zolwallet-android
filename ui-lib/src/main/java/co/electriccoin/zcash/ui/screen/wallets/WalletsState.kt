@@ -1,0 +1,23 @@
+package co.electriccoin.zcash.ui.screen.wallets
+
+import androidx.compose.runtime.Immutable
+
+@Immutable
+data class WalletsState(
+    val wallets: List<WalletItemState>,
+    val canCreateMore: Boolean,
+    val isLoading: Boolean,
+    val onCreate: (name: String) -> Unit,
+    val onBack: () -> Unit,
+)
+
+@Immutable
+data class WalletItemState(
+    val accountIndex: Int,
+    val name: String,
+    val address: String,
+    val addressShort: String,
+    val isSelected: Boolean,
+    val onSelect: () -> Unit,
+    val onRename: (newName: String) -> Unit,
+)

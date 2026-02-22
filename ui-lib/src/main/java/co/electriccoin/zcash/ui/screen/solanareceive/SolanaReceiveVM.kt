@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.sdk.ANDROID_STATE_FLOW_TIMEOUT
 import co.electriccoin.zcash.ui.NavigationRouter
+import co.electriccoin.zcash.ui.common.datasource.SolanaWalletDataSource
 import co.electriccoin.zcash.ui.common.usecase.CopyToClipboardUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,13 +26,15 @@ class SolanaReceiveVM(
     private val getSolanaAddress: GetSolanaAddressUseCase,
     private val copyToClipboard: CopyToClipboardUseCase,
     private val navigationRouter: NavigationRouter,
+    private val solanaWalletDataSource: SolanaWalletDataSource,
 ) : ViewModel() {
 
     private val address = MutableStateFlow<String?>(null)
 
     init {
         viewModelScope.launch {
-            address.value = getSolanaAddress()
+            val index = solanaWalletDataSource.selectedAccountIndex.value
+            address.value = getSolanaAddress(index)
         }
     }
 

@@ -35,10 +35,15 @@ import co.electriccoin.zcash.ui.screen.home.syncing.WalletSyncingInfo
 import co.electriccoin.zcash.ui.screen.home.syncing.WalletSyncingMessageState
 import co.electriccoin.zcash.ui.screen.home.updating.WalletUpdatingInfo
 import co.electriccoin.zcash.ui.screen.home.updating.WalletUpdatingMessageState
+import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonArgs
+import co.electriccoin.zcash.ui.screen.home.bottomnav.BottomNavTab
+import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBarState
+import co.electriccoin.zcash.ui.screen.wallets.WalletsArgs
 import co.electriccoin.zcash.ui.screen.send.Send
 import co.electriccoin.zcash.ui.util.CURRENCY_TICKER
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -136,6 +141,20 @@ class HomeVM(
 
     private var onSwapButtonClick: Job? = null
 
+    private var onBridgeButtonClick: Job? = null
+
+    val bottomNavState: StateFlow<ZolBottomNavBarState> =
+        MutableStateFlow(
+            ZolBottomNavBarState(
+                selectedTab = BottomNavTab.PORTFOLIO,
+                onPortfolioClick = {},
+                onWalletsClick = ::onWalletsNavClick,
+                onBridgeClick = ::onBridgeNavClick,
+                onSwapClick = ::onSwapNavClick,
+                onPayClick = ::onPayButtonClick,
+            )
+        )
+
     private fun createState(messageState: HomeMessageState?) =
         HomeState(
             firstButton =
@@ -149,18 +168,6 @@ class HomeVM(
                     text = stringRes(R.string.home_button_send),
                     icon = R.drawable.ic_home_send,
                     onClick = ::onSendButtonClick,
-                ),
-            thirdButton =
-                BigIconButtonState(
-                    text = stringRes(R.string.home_button_pay),
-                    icon = R.drawable.ic_home_pay,
-                    onClick = ::onPayButtonClick,
-                ),
-            fourthButton =
-                BigIconButtonState(
-                    text = stringRes(R.string.home_button_swap),
-                    icon = R.drawable.ic_home_swap,
-                    onClick = ::onSwapButtonClick,
                 ),
             message = messageState
         )
@@ -234,6 +241,19 @@ class HomeVM(
         }
 
     private fun onCrashReportMessageClick() = navigationRouter.forward(CrashReportOptIn)
+
+    private fun onWalletsNavClick() {
+        navigationRouter.forward(WalletsArgs)
+    }
+
+    private fun onBridgeNavClick() {
+        if (onBridgeButtonClick?.isActive == true) return
+        onBridgeButtonClick = viewModelScope.launch { navigateToSwap() }
+    }
+
+    private fun onSwapNavClick() {
+        navigationRouter.forward(ComingSoonArgs)
+    }
 
     private fun onSwapButtonClick() {
         if (onSwapButtonClick?.isActive == true) return

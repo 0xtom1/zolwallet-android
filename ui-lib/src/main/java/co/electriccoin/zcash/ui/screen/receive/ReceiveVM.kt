@@ -28,16 +28,30 @@ import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import xyz.zolapp.solana.repository.SolanaRepository
 
 class ReceiveVM(
     observeSelectedWalletAccount: ObserveSelectedWalletAccountUseCase,
     private val copyToClipboard: CopyToClipboardUseCase,
     private val navigationRouter: NavigationRouter,
+    private val solanaRepository: SolanaRepository,
 ) : ViewModel() {
     private val expandedIndex = MutableStateFlow(0)
+    private val solanaAddress = MutableStateFlow<String?>(null)
+
+    init {
+        viewModelScope.launch {
+            solanaAddress.value = solanaRepository.getAddress()
+        }
+    }
 
     internal val state =
-        combine(expandedIndex, observeSelectedWalletAccount.require()) { expandedIndex, account ->
+        combine(
+            expandedIndex,
+            observeSelectedWalletAccount.require(),
+            solanaAddress,
+        ) { expandedIndex, account, solAddress ->
             ReceiveState(
                 items =
                     listOfNotNull(
@@ -55,6 +69,13 @@ class ReceiveVM(
                             isExpanded = expandedIndex == 1,
                             onClick = { onAddressClick(1) }
                         ),
+                        solAddress?.let {
+                            createSolanaAddressState(
+                                address = it,
+                                isExpanded = expandedIndex == 2,
+                                onClick = { onAddressClick(2) }
+                            )
+                        },
                     ),
                 isLoading = false,
                 onBack = ::onBack
@@ -103,6 +124,8 @@ class ReceiveVM(
             },
         subtitle = stringResByAddress(value = address, middle = true),
         isShielded = type == Unified,
+        showCopy = type == Unified,
+        showRequest = true,
         onCopyClicked = {
             copyToClipboard(
                 value = address
@@ -131,6 +154,33 @@ class ReceiveVM(
                 onClick = { onAddressInfoClick(type) }
             )
     )
+
+    private fun createSolanaAddressState(
+        address: String,
+        isExpanded: Boolean,
+        onClick: () -> Unit,
+    ) = ReceiveAddressState(
+        icon = R.drawable.ic_token_sol,
+        title = stringRes("Solana Address"),
+        subtitle = stringResByAddress(value = address, middle = true),
+        isShielded = false,
+        showCopy = true,
+        showRequest = false,
+        onCopyClicked = { copyToClipboard(value = address) },
+        onQrClicked = { onSolanaQrCodeClick(address) },
+        onRequestClicked = {},
+        onClick = onClick,
+        isExpanded = isExpanded,
+        colorMode = DEFAULT,
+        infoIconButton = null,
+    )
+
+    private fun onSolanaQrCodeClick(address: String) {
+        // Navigate to the existing Solana receive screen which shows QR
+        navigationRouter.forward(
+            co.electriccoin.zcash.ui.screen.solanareceive.SolanaReceiveArgs
+        )
+    }
 
     private fun onRequestClick(addressType: ReceiveAddressType) =
         navigationRouter.forward("${NavigationTargets.REQUEST}/${addressType.ordinal}")
