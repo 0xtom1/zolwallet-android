@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.NativeKeyEvent
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,7 +41,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import co.electriccoin.zcash.ui.R
 import co.electriccoin.zcash.ui.common.appbar.ZashiMainTopAppBarState
-import co.electriccoin.zcash.ui.common.appbar.ZashiTopAppBarTags
 import co.electriccoin.zcash.ui.design.component.AssetCardState
 import co.electriccoin.zcash.ui.design.component.BlankBgScaffold
 import co.electriccoin.zcash.ui.design.component.ButtonState
@@ -62,7 +60,6 @@ import co.electriccoin.zcash.ui.design.component.ZashiInfoText
 import co.electriccoin.zcash.ui.design.component.ZashiNumberTextField
 import co.electriccoin.zcash.ui.design.component.ZashiNumberTextFieldDefaults
 import co.electriccoin.zcash.ui.design.component.ZashiSmallTopAppBar
-import co.electriccoin.zcash.ui.design.component.ZashiTopAppBarBackNavigation
 import co.electriccoin.zcash.ui.design.newcomponent.PreviewScreens
 import co.electriccoin.zcash.ui.design.theme.ZcashTheme
 import co.electriccoin.zcash.ui.design.theme.colors.ZashiColors
@@ -86,10 +83,12 @@ import co.electriccoin.zcash.ui.screen.swap.SwapErrorFooterState
 internal fun PayView(
     state: PayState,
     balanceState: BalanceWidgetState,
-    appBarState: ZashiMainTopAppBarState
+    appBarState: ZashiMainTopAppBarState,
+    bottomBar: @Composable () -> Unit = {},
 ) {
     BlankBgScaffold(
-        topBar = { TopAppBar(state, appBarState) }
+        topBar = { TopAppBar(state, appBarState) },
+        bottomBar = bottomBar,
     ) {
         Column(
             modifier =
@@ -285,12 +284,6 @@ private fun TopAppBar(state: PayState, appBarState: ZashiMainTopAppBarState) {
                 fontWeight = FontWeight.SemiBold,
                 color = ZashiColors.Text.textPrimary,
                 maxLines = 1
-            )
-        },
-        navigationAction = {
-            ZashiTopAppBarBackNavigation(
-                onBack = state.onBack,
-                modifier = Modifier.testTag(ZashiTopAppBarTags.BACK)
             )
         },
         regularActions = {

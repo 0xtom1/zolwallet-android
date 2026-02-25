@@ -30,7 +30,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.NativeKeyEvent
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +38,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.electriccoin.zcash.ui.R
-import co.electriccoin.zcash.ui.common.appbar.ZashiTopAppBarTags
 import co.electriccoin.zcash.ui.design.component.AssetCardState
 import co.electriccoin.zcash.ui.design.component.BlankBgScaffold
 import co.electriccoin.zcash.ui.design.component.ButtonState
@@ -58,7 +56,6 @@ import co.electriccoin.zcash.ui.design.component.ZashiIconButton
 import co.electriccoin.zcash.ui.design.component.ZashiImageButton
 import co.electriccoin.zcash.ui.design.component.ZashiInfoText
 import co.electriccoin.zcash.ui.design.component.ZashiSmallTopAppBar
-import co.electriccoin.zcash.ui.design.component.ZashiTopAppBarBackNavigation
 import co.electriccoin.zcash.ui.design.component.listitem.SimpleListItemState
 import co.electriccoin.zcash.ui.design.component.listitem.ZashiSimpleListItem
 import co.electriccoin.zcash.ui.design.newcomponent.PreviewScreens
@@ -78,11 +75,16 @@ import co.electriccoin.zcash.ui.screen.swap.ui.SwapAmountTextFieldState
 import co.electriccoin.zcash.ui.screen.swap.ui.SwapAmountTextState
 
 @Composable
-internal fun SwapView(state: SwapState, onSideEffect: (amountFocusRequester: FocusRequester) -> Unit = { }) {
+internal fun SwapView(
+    state: SwapState,
+    bottomBar: @Composable () -> Unit = {},
+    onSideEffect: (amountFocusRequester: FocusRequester) -> Unit = { },
+) {
     val amountFocusRequester = remember { FocusRequester() }
 
     BlankBgScaffold(
-        topBar = { TopAppBar(state) }
+        topBar = { TopAppBar(state) },
+        bottomBar = bottomBar,
     ) {
         Column(
             modifier =
@@ -244,12 +246,6 @@ private fun TopAppBar(state: SwapState) {
                     color = ZashiColors.Text.textPrimary
                 )
             }
-        },
-        navigationAction = {
-            ZashiTopAppBarBackNavigation(
-                onBack = state.onBack,
-                modifier = Modifier.testTag(ZashiTopAppBarTags.BACK)
-            )
         },
         regularActions = {
             ZashiIconButton(state.swapInfoButton)

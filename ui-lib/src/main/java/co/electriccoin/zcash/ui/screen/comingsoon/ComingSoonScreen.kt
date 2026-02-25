@@ -9,28 +9,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import co.electriccoin.zcash.ui.NavigationRouter
 import co.electriccoin.zcash.ui.design.component.BlankBgScaffold
-import co.electriccoin.zcash.ui.design.component.TopAppBarBackNavigation
 import co.electriccoin.zcash.ui.design.component.ZashiSmallTopAppBar
 import co.electriccoin.zcash.ui.design.theme.colors.ZashiColors
+import co.electriccoin.zcash.ui.screen.home.bottomnav.BottomNavTab
+import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBarForTab
 import kotlinx.serialization.Serializable
-import org.koin.compose.koinInject
 
 @Serializable
 data object ComingSoonArgs
 
 @Composable
 fun ComingSoonScreen() {
-    val navigationRouter = koinInject<NavigationRouter>()
-
     BlankBgScaffold(
         topBar = {
-            ZashiSmallTopAppBar(
-                title = "",
-                navigationAction = { TopAppBarBackNavigation(onBack = { navigationRouter.back() }) }
-            )
-        }
+            ZashiSmallTopAppBar(title = "Swap")
+        },
+        bottomBar = { ZolBottomNavBarForTab(BottomNavTab.SWAP) }
     ) { paddingValues ->
         Box(
             modifier =

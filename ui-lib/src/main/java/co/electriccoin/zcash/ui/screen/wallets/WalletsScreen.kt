@@ -35,9 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.electriccoin.zcash.ui.design.component.BlankBgScaffold
-import co.electriccoin.zcash.ui.design.component.TopAppBarBackNavigation
 import co.electriccoin.zcash.ui.design.component.ZashiSmallTopAppBar
 import co.electriccoin.zcash.ui.design.theme.colors.ZashiColors
+import co.electriccoin.zcash.ui.screen.home.bottomnav.BottomNavTab
+import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBarForTab
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -53,11 +54,9 @@ fun WalletsScreen(viewModel: WalletsVM = koinViewModel()) {
 
     BlankBgScaffold(
         topBar = {
-            ZashiSmallTopAppBar(
-                title = "Wallets",
-                navigationAction = { TopAppBarBackNavigation(onBack = state.onBack) }
-            )
-        }
+            ZashiSmallTopAppBar(title = "Wallets")
+        },
+        bottomBar = { ZolBottomNavBarForTab(BottomNavTab.WALLETS) }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier

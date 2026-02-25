@@ -7,6 +7,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.electriccoin.zcash.ui.common.appbar.ZashiTopAppBarVM
 import co.electriccoin.zcash.ui.screen.balances.BalanceWidgetArgs
 import co.electriccoin.zcash.ui.screen.balances.BalanceWidgetVM
+import co.electriccoin.zcash.ui.screen.home.bottomnav.BottomNavTab
+import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBarForTab
 import co.electriccoin.zcash.ui.screen.swap.SwapCancelView
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
@@ -30,7 +32,7 @@ fun PayScreen() {
     val balanceState by balanceVM.state.collectAsStateWithLifecycle()
     val appBarState by appBarVM.state.collectAsStateWithLifecycle()
     val cancelState by vm.cancelState.collectAsStateWithLifecycle()
-    state?.let { PayView(it, balanceState, appBarState) }
+    state?.let { PayView(it, balanceState, appBarState, bottomBar = { ZolBottomNavBarForTab(BottomNavTab.PAY) }) }
     BackHandler(state != null) { state?.onBack?.invoke() }
     SwapCancelView(cancelState)
 }

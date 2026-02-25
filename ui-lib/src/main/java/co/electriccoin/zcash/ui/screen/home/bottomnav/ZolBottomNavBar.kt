@@ -7,8 +7,15 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import co.electriccoin.zcash.ui.NavigationRouter
 import co.electriccoin.zcash.ui.R
 import co.electriccoin.zcash.ui.design.theme.colors.ZashiColors
+import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonArgs
+import co.electriccoin.zcash.ui.screen.home.HomeArgs
+import co.electriccoin.zcash.ui.screen.pay.PayArgs
+import co.electriccoin.zcash.ui.screen.swap.SwapArgs
+import co.electriccoin.zcash.ui.screen.wallets.WalletsArgs
+import org.koin.compose.koinInject
 
 @Composable
 fun ZolBottomNavBar(state: ZolBottomNavBarState) {
@@ -51,6 +58,29 @@ fun ZolBottomNavBar(state: ZolBottomNavBarState) {
             colors = navItemColors(),
         )
     }
+}
+
+@Composable
+fun ZolBottomNavBarForTab(selectedTab: BottomNavTab) {
+    val navigationRouter = koinInject<NavigationRouter>()
+    ZolBottomNavBar(
+        state = ZolBottomNavBarState(
+            selectedTab = selectedTab,
+            onPortfolioClick = { navigationRouter.backTo(HomeArgs::class) },
+            onWalletsClick = {
+                if (selectedTab != BottomNavTab.WALLETS) navigationRouter.replace(WalletsArgs)
+            },
+            onBridgeClick = {
+                if (selectedTab != BottomNavTab.BRIDGE) navigationRouter.replace(SwapArgs)
+            },
+            onSwapClick = {
+                if (selectedTab != BottomNavTab.SWAP) navigationRouter.replace(ComingSoonArgs)
+            },
+            onPayClick = {
+                if (selectedTab != BottomNavTab.PAY) navigationRouter.replace(PayArgs)
+            },
+        )
+    )
 }
 
 @Composable

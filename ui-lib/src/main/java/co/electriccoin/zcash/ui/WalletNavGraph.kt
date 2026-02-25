@@ -1,5 +1,7 @@
 package co.electriccoin.zcash.ui
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -261,7 +263,12 @@ fun NavGraphBuilder.walletNavGraph(
         composable<ThirdPartyScan> { AndroidThirdPartyScan() }
         dialogComposable<SwapAssetPickerArgs> { SwapAssetPickerScreen(it.toRoute()) }
         dialogComposable<SwapBlockchainPickerArgs> { SwapBlockchainPickerScreen(it.toRoute()) }
-        composable<SwapArgs> { SwapScreen() }
+        composable<SwapArgs>(
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+            popExitTransition = { fadeOut() },
+        ) { SwapScreen() }
         dialogComposable<SwapSlippageArgs> { SwapSlippageScreen(it.toRoute()) }
         dialogComposable<SwapInfoArgs> { SwapInfoScreen() }
         dialogComposable<SwapQuoteArgs> { SwapQuoteScreen() }
@@ -275,7 +282,12 @@ fun NavGraphBuilder.walletNavGraph(
         dialogComposable<ShieldedAddressInfoArgs> { ShieldedAddressInfoScreen() }
         dialogComposable<TransparentAddressInfoArgs> { TransparentAddressInfoScreen() }
         composable<ExchangeRateOptInArgs> { ExchangeRateOptInScreen() }
-        composable<PayArgs> { PayScreen() }
+        composable<PayArgs>(
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+            popExitTransition = { fadeOut() },
+        ) { PayScreen() }
         dialogComposable<PayInfoArgs> { PayInfoScreen() }
         composable<ORSwapConfirmationArgs> { ORSwapConfirmationScreen() }
         composable<SwapDetailArgs> { SwapDetailScreen(it.toRoute()) }
@@ -285,8 +297,18 @@ fun NavGraphBuilder.walletNavGraph(
         dialogComposable<EphemeralLockArgs> { EphemeralLockScreen() }
         composable<SolanaSendArgs> { SolanaSendScreen() }
         composable<SolanaReceiveArgs> { SolanaReceiveScreen() }
-        composable<ComingSoonArgs> { ComingSoonScreen() }
-        composable<WalletsArgs> { WalletsScreen() }
+        composable<ComingSoonArgs>(
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+            popExitTransition = { fadeOut() },
+        ) { ComingSoonScreen() }
+        composable<WalletsArgs>(
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+            popExitTransition = { fadeOut() },
+        ) { WalletsScreen() }
         composable<DebugArgs> { DebugScreen() }
         composable<DebugDBArgs> { DebugDBScreen() }
         dialogComposable<DebugTextArgs> { DebugTextScreen(it.toRoute()) }
