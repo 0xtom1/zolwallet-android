@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import co.electriccoin.zcash.ui.design.theme.ExtendedColors
 
 internal object Dark {
-    val primaryColor = Color(0xFF231F20)
+    val primaryColor = Color(0xFF000000)
     val secondaryColor = Color(0xFFFFFFFF)
 
     val backgroundColor = primaryColor
@@ -80,7 +80,7 @@ internal object Light {
     val textDescriptionDark = Color(0xFF4D4D4D)
     val reference = Color(0xFF000000)
 
-    val welcomeAnimationColor = Color(0xFF231F20)
+    val welcomeAnimationColor = Color(0xFF000000)
     val complementaryColor = Color(0xFFF4B728)
 
     val primaryDividerColor = Color(0xFFDDDDDD)

@@ -5,7 +5,7 @@ val DarkZashiColorsInternal =
         Surfaces =
             Surfaces(
                 bgPrimary = Base.Obsidian,
-                bgAdjust = Shark.`900`,
+                bgAdjust = Base.Obsidian,
                 bgSecondary = SharkShades.`06dp`,
                 bgTertiary = Shark.`800`,
                 bgQuaternary = Shark.`700`,

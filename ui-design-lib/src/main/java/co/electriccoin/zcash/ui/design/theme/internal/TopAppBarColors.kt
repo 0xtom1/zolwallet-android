@@ -81,7 +81,7 @@ internal data class LightTopAppBarColors(
 
 @Immutable
 internal data class DarkTopAppBarColors(
-    override val containerColor: Color = Color(0xFF231F20),
+    override val containerColor: Color = Color(0xFF000000),
     override val navigationColor: Color = Color(0xFFFFFFFF),
     override val titleColor: Color = Color(0xFFFFFFFF),
     override val subTitleColor: Color = Color(0xFFFFFFFF),

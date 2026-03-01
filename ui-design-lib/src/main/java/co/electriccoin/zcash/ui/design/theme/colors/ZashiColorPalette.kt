@@ -8,7 +8,7 @@ internal object Base {
     val Bone = Color(0xFFFFFFFF)
     val Concrete = Color(0xFFF4F4F4)
     val Espresso = Color(0xFF332424)
-    val Obsidian = Color(0xFF231F20)
+    val Obsidian = Color(0xFF000000)
     val Brand = Color(0xFFFCBB1A)
 }
 
@@ -51,23 +51,23 @@ internal object Shark {
     val `400` = Color(0xFF939091)
     val `500` = Color(0xFF7E7C7C)
     val `600` = Color(0xFF6B6868)
-    val `700` = Color(0xFF585455)
-    val `800` = Color(0xFF454243)
-    val `900` = Color(0xFF343031)
-    val `950` = Color(0xFF231F20)
+    val `700` = Color(0xFF454243)
+    val `800` = Color(0xFF2E2E2E)
+    val `900` = Color(0xFF1A1A1A)
+    val `950` = Color(0xFF000000)
 }
 
 internal object SharkShades {
-    val `00dp` = Color(0xFF231F20)
-    val `01dp` = Color(0xFF2E2A2B)
-    val `02dp` = Color(0xFF322F30)
-    val `03dp` = Color(0xFF353132)
-    val `04dp` = Color(0xFF373334)
-    val `06dp` = Color(0xFF3B3839)
-    val `08dp` = Color(0xFF3D3A3B)
-    val `12dp` = Color(0xFF423E3F)
-    val `16dp` = Color(0xFF444141)
-    val `24dp` = Color(0xFF464344)
+    val `00dp` = Color(0xFF000000)
+    val `01dp` = Color(0xFF0D0D0D)
+    val `02dp` = Color(0xFF121212)
+    val `03dp` = Color(0xFF151515)
+    val `04dp` = Color(0xFF171717)
+    val `06dp` = Color(0xFF1C1C1C)
+    val `08dp` = Color(0xFF1F1F1F)
+    val `12dp` = Color(0xFF242424)
+    val `16dp` = Color(0xFF272727)
+    val `24dp` = Color(0xFF2A2A2A)
 }
 
 internal object SuccessGreen {
@@ -177,5 +177,5 @@ internal object Espresso {
 
 internal object TransparentColorPalette {
     val Light = Color(0xFFFFFFFF)
-    val Dark = Color(0xFF231F20)
+    val Dark = Color(0xFF000000)
 }
