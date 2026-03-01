@@ -9,6 +9,7 @@ import co.electriccoin.zcash.ui.common.datasource.AccountDataSource
 import co.electriccoin.zcash.ui.common.datasource.SolanaWalletDataSource
 import co.electriccoin.zcash.ui.common.wallet.ExchangeRateState
 import co.electriccoin.zcash.ui.common.repository.ExchangeRateRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,7 +35,10 @@ class TokenListVM(
     init {
         viewModelScope.launch {
             solanaWalletDataSource.selectedAccountIndex.collectLatest { index ->
-                solanaRepository.fetchTokenData(index)
+                while (true) {
+                    solanaRepository.fetchTokenData(index)
+                    delay(REFRESH_INTERVAL_MS)
+                }
             }
         }
     }
@@ -141,6 +145,7 @@ class TokenListVM(
     }
 
     companion object {
+        private const val REFRESH_INTERVAL_MS = 30_000L
         private const val ZATOSHI_PER_ZEC = 100_000_000.0
         private const val MAX_ZEC_DECIMALS = 8
         private const val MAX_SOL_DECIMALS = 4
