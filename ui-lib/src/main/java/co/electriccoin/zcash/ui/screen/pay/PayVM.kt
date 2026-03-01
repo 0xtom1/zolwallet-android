@@ -176,6 +176,8 @@ internal class PayVM(
             )
 
     init {
+        swapRepository.requestRefreshAssets()
+
         swapRepository
             .selectedAsset
             .onEach { asset ->

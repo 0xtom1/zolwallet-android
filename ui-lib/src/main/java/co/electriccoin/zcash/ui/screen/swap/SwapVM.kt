@@ -167,6 +167,8 @@ internal class SwapVM(
             )
 
     init {
+        swapRepository.requestRefreshAssets()
+
         preselectSwapAsset
             .observe()
             .launchIn(viewModelScope)
