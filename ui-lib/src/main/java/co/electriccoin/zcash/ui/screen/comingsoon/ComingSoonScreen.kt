@@ -43,3 +43,27 @@ fun ComingSoonScreen() {
         }
     }
 }
+
+@Composable
+fun ComingSoonContent() {
+    BlankBgScaffold(
+        topBar = {
+            ZashiSmallTopAppBar(title = "Swap")
+        },
+    ) { paddingValues ->
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Coming Soon",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = ZashiColors.Text.textPrimary,
+            )
+        }
+    }
+}

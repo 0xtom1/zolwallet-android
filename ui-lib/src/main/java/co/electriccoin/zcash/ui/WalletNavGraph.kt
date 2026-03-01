@@ -1,7 +1,5 @@
 package co.electriccoin.zcash.ui
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -32,6 +30,8 @@ import co.electriccoin.zcash.ui.screen.chooseserver.ChooseServerArgs
 import co.electriccoin.zcash.ui.screen.chooseserver.ChooseServerScreen
 import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonArgs
 import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonScreen
+import co.electriccoin.zcash.ui.screen.tabhost.TabHostArgs
+import co.electriccoin.zcash.ui.screen.tabhost.TabHostScreen
 import co.electriccoin.zcash.ui.screen.wallets.WalletsArgs
 import co.electriccoin.zcash.ui.screen.wallets.WalletsScreen
 import co.electriccoin.zcash.ui.screen.connectkeystone.AndroidConnectKeystone
@@ -60,8 +60,6 @@ import co.electriccoin.zcash.ui.screen.exchangerate.settings.ExchangeRateSetting
 import co.electriccoin.zcash.ui.screen.exportdata.WrapExportPrivateData
 import co.electriccoin.zcash.ui.screen.feedback.FeedbackArgs
 import co.electriccoin.zcash.ui.screen.feedback.FeedbackScreen
-import co.electriccoin.zcash.ui.screen.home.AndroidHome
-import co.electriccoin.zcash.ui.screen.home.HomeArgs
 import co.electriccoin.zcash.ui.screen.home.backup.AndroidWalletBackupDetail
 import co.electriccoin.zcash.ui.screen.home.backup.AndroidWalletBackupInfo
 import co.electriccoin.zcash.ui.screen.home.backup.SeedBackupInfo
@@ -183,9 +181,9 @@ fun NavGraphBuilder.walletNavGraph(
     storageCheckViewModel: StorageCheckViewModel,
     navigationRouter: NavigationRouter,
 ) {
-    navigation<MainAppGraph>(startDestination = HomeArgs) {
-        composable<HomeArgs> {
-            AndroidHome()
+    navigation<MainAppGraph>(startDestination = TabHostArgs) {
+        composable<TabHostArgs> {
+            TabHostScreen()
             val isEnoughSpace by storageCheckViewModel.isEnoughSpace.collectAsStateWithLifecycle()
             if (isEnoughSpace == false) {
                 navigationRouter.forward(NavigationTargets.NOT_ENOUGH_SPACE)
@@ -271,12 +269,7 @@ fun NavGraphBuilder.walletNavGraph(
         composable<ThirdPartyScan> { AndroidThirdPartyScan() }
         dialogComposable<SwapAssetPickerArgs> { SwapAssetPickerScreen(it.toRoute()) }
         dialogComposable<SwapBlockchainPickerArgs> { SwapBlockchainPickerScreen(it.toRoute()) }
-        composable<SwapArgs>(
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() },
-            popEnterTransition = { fadeIn() },
-            popExitTransition = { fadeOut() },
-        ) { SwapScreen() }
+        composable<SwapArgs> { SwapScreen() }
         dialogComposable<SwapSlippageArgs> { SwapSlippageScreen(it.toRoute()) }
         dialogComposable<SwapInfoArgs> { SwapInfoScreen() }
         dialogComposable<SwapQuoteArgs> { SwapQuoteScreen() }
@@ -290,12 +283,7 @@ fun NavGraphBuilder.walletNavGraph(
         dialogComposable<ShieldedAddressInfoArgs> { ShieldedAddressInfoScreen() }
         dialogComposable<TransparentAddressInfoArgs> { TransparentAddressInfoScreen() }
         composable<ExchangeRateOptInArgs> { ExchangeRateOptInScreen() }
-        composable<PayArgs>(
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() },
-            popEnterTransition = { fadeIn() },
-            popExitTransition = { fadeOut() },
-        ) { PayScreen() }
+        composable<PayArgs> { PayScreen() }
         dialogComposable<PayInfoArgs> { PayInfoScreen() }
         composable<ORSwapConfirmationArgs> { ORSwapConfirmationScreen() }
         composable<SwapDetailArgs> { SwapDetailScreen(it.toRoute()) }
@@ -305,18 +293,8 @@ fun NavGraphBuilder.walletNavGraph(
         dialogComposable<EphemeralLockArgs> { EphemeralLockScreen() }
         composable<SolanaSendArgs> { SolanaSendScreen() }
         composable<SolanaReceiveArgs> { SolanaReceiveScreen() }
-        composable<ComingSoonArgs>(
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() },
-            popEnterTransition = { fadeIn() },
-            popExitTransition = { fadeOut() },
-        ) { ComingSoonScreen() }
-        composable<WalletsArgs>(
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() },
-            popEnterTransition = { fadeIn() },
-            popExitTransition = { fadeOut() },
-        ) { WalletsScreen() }
+        composable<ComingSoonArgs> { ComingSoonScreen() }
+        composable<WalletsArgs> { WalletsScreen() }
         composable<DebugArgs> { DebugScreen() }
         composable<DebugDBArgs> { DebugDBScreen() }
         dialogComposable<DebugTextArgs> { DebugTextScreen(it.toRoute()) }

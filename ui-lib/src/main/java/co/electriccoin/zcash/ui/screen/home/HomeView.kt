@@ -33,14 +33,12 @@ import co.electriccoin.zcash.ui.design.component.BigIconButtonState
 import co.electriccoin.zcash.ui.design.component.BlankBgScaffold
 import co.electriccoin.zcash.ui.design.newcomponent.PreviewScreens
 import co.electriccoin.zcash.ui.design.theme.ZcashTheme
+import co.electriccoin.zcash.ui.design.theme.balances.LocalBalancesAvailable
 import co.electriccoin.zcash.ui.design.theme.colors.ZashiColors
 import co.electriccoin.zcash.ui.design.theme.dimensions.ZashiDimensions
 import co.electriccoin.zcash.ui.design.util.getValue
 import co.electriccoin.zcash.ui.design.util.stringRes
 import co.electriccoin.zcash.ui.fixture.ZashiMainTopAppBarStateFixture
-import co.electriccoin.zcash.ui.screen.home.bottomnav.BottomNavTab
-import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBar
-import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBarState
 import co.electriccoin.zcash.ui.screen.home.error.WalletErrorMessageState
 import co.electriccoin.zcash.ui.screen.home.tokenlist.TokenListState
 import co.electriccoin.zcash.ui.screen.home.tokenlist.TokenRowState
@@ -51,11 +49,9 @@ internal fun HomeView(
     appBarState: ZashiMainTopAppBarState?,
     state: HomeState,
     tokenListState: TokenListState,
-    bottomNavState: ZolBottomNavBarState,
 ) {
     BlankBgScaffold(
         topBar = { ZashiTopAppBarWithAccountSelection(appBarState) },
-        bottomBar = { ZolBottomNavBar(bottomNavState) }
     ) { paddingValues ->
         Content(
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding() + ZashiDimensions.Spacing.spacingLg),
@@ -121,8 +117,9 @@ private fun PortfolioHeader(
     modifier: Modifier = Modifier,
 ) {
     if (totalUsd != null) {
+        val balancesAvailable = LocalBalancesAvailable.current
         Text(
-            text = totalUsd,
+            text = if (balancesAvailable) totalUsd else "***",
             modifier = modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -243,15 +240,6 @@ private fun Preview() {
                     ),
                     totalPortfolioUsd = "$345.00",
                     isLoading = false,
-                ),
-            bottomNavState =
-                ZolBottomNavBarState(
-                    selectedTab = BottomNavTab.PORTFOLIO,
-                    onPortfolioClick = {},
-                    onWalletsClick = {},
-                    onBridgeClick = {},
-                    onSwapClick = {},
-                    onPayClick = {},
                 ),
         )
     }

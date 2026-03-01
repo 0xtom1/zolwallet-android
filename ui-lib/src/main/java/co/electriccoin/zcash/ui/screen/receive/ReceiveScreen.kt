@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.electriccoin.zcash.di.koinActivityViewModel
 import co.electriccoin.zcash.ui.common.appbar.ZashiTopAppBarVM
+import co.electriccoin.zcash.ui.common.gesture.SwipeBackWrapper
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -21,10 +22,12 @@ internal fun ReceiveScreen() {
         state.onBack()
     }
 
-    ReceiveView(
-        state = state,
-        appBarState = appBarState,
-    )
+    SwipeBackWrapper(onBack = { state.onBack() }) {
+        ReceiveView(
+            state = state,
+            appBarState = appBarState,
+        )
+    }
 }
 
 @Serializable

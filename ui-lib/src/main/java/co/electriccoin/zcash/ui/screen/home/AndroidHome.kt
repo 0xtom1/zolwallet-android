@@ -22,14 +22,12 @@ internal fun AndroidHome() {
     val state by homeVM.state.collectAsStateWithLifecycle()
     homeVM.uiLifecyclePipeline.collectAsStateWithLifecycle()
     val tokenListState by tokenListVM.state.collectAsStateWithLifecycle()
-    val bottomNavState by homeVM.bottomNavState.collectAsStateWithLifecycle()
 
     state?.let {
         HomeView(
             appBarState = appBarState,
             state = it,
             tokenListState = tokenListState,
-            bottomNavState = bottomNavState,
         )
     }
 

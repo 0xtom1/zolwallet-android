@@ -40,6 +40,7 @@ import co.electriccoin.zcash.ui.screen.send.ext.Saver
 import co.electriccoin.zcash.ui.screen.send.model.AmountState
 import co.electriccoin.zcash.ui.screen.send.model.MemoState
 import co.electriccoin.zcash.ui.screen.send.model.RecipientAddressState
+import co.electriccoin.zcash.ui.common.gesture.SwipeBackWrapper
 import co.electriccoin.zcash.ui.screen.send.model.SendStage
 import co.electriccoin.zcash.ui.screen.send.view.Send
 import kotlinx.coroutines.launch
@@ -279,46 +280,51 @@ internal fun WrapSend(
         }
     }
 
-    if (null == synchronizer || null == selectedAccount) {
-        // TODO [#1146]: Consider moving CircularScreenProgressIndicator from Android layer to View layer
-        // TODO [#1146]: Improve this by allowing screen composition and updating it after the data is available
-        // TODO [#1146]: https://github.com/Electric-Coin-Company/zashi-android/issues/1146
-        CircularScreenProgressIndicator()
-    } else {
-        Send(
-            balanceWidgetState = balanceWidgetState,
-            sendStage = sendStage,
-            onCreateZecSend = { newZecSend ->
-                viewModel.onCreateZecSendClick(
-                    newZecSend = newZecSend,
-                    amountState = amountState,
-                    setSendStage = setSendStage
-                )
-            },
-            onBack = onBackAction,
-            onQrScannerOpen = goToQrScanner,
-            hasCameraFeature = hasCameraFeature,
-            recipientAddressState = recipientAddressState,
-            onRecipientAddressChange = {
-                scope.launch {
-                    viewModel.onRecipientAddressChanged(
-                        RecipientAddressState.new(
-                            address = it,
-                            // TODO [#342]: Verify Addresses without Synchronizer
-                            // TODO [#342]: https://github.com/zcash/zcash-android-wallet-sdk/issues/342
-                            type = synchronizer.validateAddress(it)
-                        )
+    SwipeBackWrapper(
+        onBack = onBackAction,
+        enabled = sendStage != SendStage.Proposing,
+    ) {
+        if (null == synchronizer || null == selectedAccount) {
+            // TODO [#1146]: Consider moving CircularScreenProgressIndicator from Android layer to View layer
+            // TODO [#1146]: Improve this by allowing screen composition and updating it after the data is available
+            // TODO [#1146]: https://github.com/Electric-Coin-Company/zashi-android/issues/1146
+            CircularScreenProgressIndicator()
+        } else {
+            Send(
+                balanceWidgetState = balanceWidgetState,
+                sendStage = sendStage,
+                onCreateZecSend = { newZecSend ->
+                    viewModel.onCreateZecSendClick(
+                        newZecSend = newZecSend,
+                        amountState = amountState,
+                        setSendStage = setSendStage
                     )
-                }
-            },
-            setAmountState = setAmountState,
-            amountState = amountState,
-            setMemoState = setMemoState,
-            memoState = memoState,
-            selectedAccount = selectedAccount,
-            exchangeRateState = exchangeRateState,
-            sendAddressBookState = sendAddressBookState,
-            zashiMainTopAppBarState = zashiMainTopAppBarState
-        )
+                },
+                onBack = onBackAction,
+                onQrScannerOpen = goToQrScanner,
+                hasCameraFeature = hasCameraFeature,
+                recipientAddressState = recipientAddressState,
+                onRecipientAddressChange = {
+                    scope.launch {
+                        viewModel.onRecipientAddressChanged(
+                            RecipientAddressState.new(
+                                address = it,
+                                // TODO [#342]: Verify Addresses without Synchronizer
+                                // TODO [#342]: https://github.com/zcash/zcash-android-wallet-sdk/issues/342
+                                type = synchronizer.validateAddress(it)
+                            )
+                        )
+                    }
+                },
+                setAmountState = setAmountState,
+                amountState = amountState,
+                setMemoState = setMemoState,
+                memoState = memoState,
+                selectedAccount = selectedAccount,
+                exchangeRateState = exchangeRateState,
+                sendAddressBookState = sendAddressBookState,
+                zashiMainTopAppBarState = zashiMainTopAppBarState
+            )
+        }
     }
 }

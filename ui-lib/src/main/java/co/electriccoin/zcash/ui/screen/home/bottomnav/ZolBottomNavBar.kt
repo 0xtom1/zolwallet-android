@@ -11,9 +11,9 @@ import co.electriccoin.zcash.ui.NavigationRouter
 import co.electriccoin.zcash.ui.R
 import co.electriccoin.zcash.ui.design.theme.colors.ZashiColors
 import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonArgs
-import co.electriccoin.zcash.ui.screen.home.HomeArgs
 import co.electriccoin.zcash.ui.screen.pay.PayArgs
 import co.electriccoin.zcash.ui.screen.swap.SwapArgs
+import co.electriccoin.zcash.ui.screen.tabhost.TabHostArgs
 import co.electriccoin.zcash.ui.screen.wallets.WalletsArgs
 import org.koin.compose.koinInject
 
@@ -66,7 +66,7 @@ fun ZolBottomNavBarForTab(selectedTab: BottomNavTab) {
     ZolBottomNavBar(
         state = ZolBottomNavBarState(
             selectedTab = selectedTab,
-            onPortfolioClick = { navigationRouter.backTo(HomeArgs::class) },
+            onPortfolioClick = { navigationRouter.backTo(TabHostArgs::class) },
             onWalletsClick = {
                 if (selectedTab != BottomNavTab.WALLETS) navigationRouter.replace(WalletsArgs)
             },

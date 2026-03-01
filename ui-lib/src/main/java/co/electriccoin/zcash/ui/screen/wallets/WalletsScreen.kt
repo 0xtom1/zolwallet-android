@@ -49,12 +49,14 @@ import org.koin.androidx.compose.koinViewModel
 data object WalletsArgs
 
 @Composable
-fun WalletsScreen(viewModel: WalletsVM = koinViewModel()) {
+fun WalletsScreen(showBottomBar: Boolean = true, viewModel: WalletsVM = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     var selectedTab by remember { mutableIntStateOf(0) }
     var showCreateDialog by remember { mutableStateOf(false) }
+    var showCreateEphemeralDialog by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<WalletItemState?>(null) }
+    var ephemeralRenameTarget by remember { mutableStateOf<EphemeralAddressItemState?>(null) }
 
     BlankBgScaffold(
         topBar = {
@@ -78,7 +80,7 @@ fun WalletsScreen(viewModel: WalletsVM = koinViewModel()) {
                 }
             }
         },
-        bottomBar = { ZolBottomNavBarForTab(BottomNavTab.WALLETS) }
+        bottomBar = if (showBottomBar) ({ ZolBottomNavBarForTab(BottomNavTab.WALLETS) }) else ({})
     ) { paddingValues ->
         when (selectedTab) {
             0 -> SolanaTabContent(
@@ -96,6 +98,8 @@ fun WalletsScreen(viewModel: WalletsVM = koinViewModel()) {
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp),
+                onCreateClick = { showCreateEphemeralDialog = true },
+                onRenameClick = { ephemeralRenameTarget = it },
             )
         }
     }
@@ -121,6 +125,30 @@ fun WalletsScreen(viewModel: WalletsVM = koinViewModel()) {
                 renameTarget = null
             },
             onDismiss = { renameTarget = null },
+        )
+    }
+
+    if (showCreateEphemeralDialog) {
+        WalletNameDialog(
+            title = "Create Address",
+            initialName = viewModel.nextDefaultEphemeralName(),
+            onConfirm = { name ->
+                state.onCreateEphemeralNamed(name)
+                showCreateEphemeralDialog = false
+            },
+            onDismiss = { showCreateEphemeralDialog = false },
+        )
+    }
+
+    ephemeralRenameTarget?.let { item ->
+        WalletNameDialog(
+            title = "Rename Address",
+            initialName = item.name,
+            onConfirm = { newName ->
+                item.onRename(newName)
+                ephemeralRenameTarget = null
+            },
+            onDismiss = { ephemeralRenameTarget = null },
         )
     }
 }
@@ -159,27 +187,35 @@ private fun SolanaTabContent(
 private fun ZcashTabContent(
     state: WalletsState,
     modifier: Modifier = Modifier,
+    onCreateClick: () -> Unit,
+    onRenameClick: (EphemeralAddressItemState) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         items(
             items = state.ephemeralAddresses,
             key = { it.address },
         ) { item ->
-            EphemeralAddressRow(item = item)
+            EphemeralAddressRow(
+                item = item,
+                onRenameClick = { onRenameClick(item) },
+            )
             HorizontalDivider(color = ZashiColors.Surfaces.bgSecondary)
         }
 
         item {
             CreateRow(
                 label = "Create Address",
-                onClick = state.onCreateEphemeral,
+                onClick = onCreateClick,
             )
         }
     }
 }
 
 @Composable
-private fun EphemeralAddressRow(item: EphemeralAddressItemState) {
+private fun EphemeralAddressRow(
+    item: EphemeralAddressItemState,
+    onRenameClick: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -191,7 +227,7 @@ private fun EphemeralAddressRow(item: EphemeralAddressItemState) {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Ephemeral Address",
+                text = item.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = ZashiColors.Text.textPrimary,
@@ -201,6 +237,15 @@ private fun EphemeralAddressRow(item: EphemeralAddressItemState) {
                 text = item.addressShort,
                 fontSize = 13.sp,
                 color = ZashiColors.Text.textTertiary,
+            )
+        }
+
+        IconButton(onClick = onRenameClick) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Rename",
+                tint = ZashiColors.Text.textTertiary,
+                modifier = Modifier.size(18.dp),
             )
         }
     }

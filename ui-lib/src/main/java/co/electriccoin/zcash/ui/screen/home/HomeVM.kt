@@ -9,9 +9,7 @@ import co.electriccoin.zcash.ui.common.provider.ShieldFundsInfoProvider
 import co.electriccoin.zcash.ui.common.repository.HomeMessageData
 import co.electriccoin.zcash.ui.common.usecase.GetHomeMessageUseCase
 import co.electriccoin.zcash.ui.common.usecase.IsRestoreSuccessDialogVisibleUseCase
-import co.electriccoin.zcash.ui.common.usecase.NavigateToNearPayUseCase
 import co.electriccoin.zcash.ui.common.usecase.NavigateToReceiveUseCase
-import co.electriccoin.zcash.ui.common.usecase.NavigateToSwapUseCase
 import co.electriccoin.zcash.ui.common.usecase.ShieldFundsFromMessageUseCase
 import co.electriccoin.zcash.ui.design.component.BigIconButtonState
 import co.electriccoin.zcash.ui.design.util.TickerLocation.HIDDEN
@@ -35,15 +33,9 @@ import co.electriccoin.zcash.ui.screen.home.syncing.WalletSyncingInfo
 import co.electriccoin.zcash.ui.screen.home.syncing.WalletSyncingMessageState
 import co.electriccoin.zcash.ui.screen.home.updating.WalletUpdatingInfo
 import co.electriccoin.zcash.ui.screen.home.updating.WalletUpdatingMessageState
-import co.electriccoin.zcash.ui.screen.comingsoon.ComingSoonArgs
-import co.electriccoin.zcash.ui.screen.home.bottomnav.BottomNavTab
-import co.electriccoin.zcash.ui.screen.home.bottomnav.ZolBottomNavBarState
-import co.electriccoin.zcash.ui.screen.wallets.WalletsArgs
 import co.electriccoin.zcash.ui.screen.send.Send
 import co.electriccoin.zcash.ui.util.CURRENCY_TICKER
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -63,9 +55,7 @@ class HomeVM(
     private val navigationRouter: NavigationRouter,
     private val shieldFundsFromMessage: ShieldFundsFromMessageUseCase,
     private val navigateToError: NavigateToErrorUseCase,
-    private val navigateToReceive: NavigateToReceiveUseCase,
-    private val navigateToNearPay: NavigateToNearPayUseCase,
-    private val navigateToSwap: NavigateToSwapUseCase
+    private val navigateToReceive: NavigateToReceiveUseCase
 ) : ViewModel() {
     private var hasSyncErrorBeenShown = false
 
@@ -136,24 +126,6 @@ class HomeVM(
                 started = SharingStarted.WhileSubscribed(1.seconds, Duration.ZERO),
                 initialValue = Unit
             )
-
-    private var onPayButtonClickJob: Job? = null
-
-    private var onSwapButtonClick: Job? = null
-
-    private var onBridgeButtonClick: Job? = null
-
-    val bottomNavState: StateFlow<ZolBottomNavBarState> =
-        MutableStateFlow(
-            ZolBottomNavBarState(
-                selectedTab = BottomNavTab.PORTFOLIO,
-                onPortfolioClick = {},
-                onWalletsClick = ::onWalletsNavClick,
-                onBridgeClick = ::onBridgeNavClick,
-                onSwapClick = ::onSwapNavClick,
-                onPayClick = ::onPayButtonClick,
-            )
-        )
 
     private fun createState(messageState: HomeMessageState?) =
         HomeState(
@@ -242,32 +214,9 @@ class HomeVM(
 
     private fun onCrashReportMessageClick() = navigationRouter.forward(CrashReportOptIn)
 
-    private fun onWalletsNavClick() {
-        navigationRouter.forward(WalletsArgs)
-    }
-
-    private fun onBridgeNavClick() {
-        if (onBridgeButtonClick?.isActive == true) return
-        onBridgeButtonClick = viewModelScope.launch { navigateToSwap() }
-    }
-
-    private fun onSwapNavClick() {
-        navigationRouter.forward(ComingSoonArgs)
-    }
-
-    private fun onSwapButtonClick() {
-        if (onSwapButtonClick?.isActive == true) return
-        onSwapButtonClick = viewModelScope.launch { navigateToSwap() }
-    }
-
     private fun onSendButtonClick() = navigationRouter.forward(Send())
 
     private fun onReceiveButtonClick() = viewModelScope.launch { navigateToReceive() }
-
-    private fun onPayButtonClick() {
-        if (onPayButtonClickJob?.isActive == true) return
-        onPayButtonClickJob = viewModelScope.launch { navigateToNearPay() }
-    }
 
     private fun onWalletUpdatingMessageClick() = navigationRouter.forward(WalletUpdatingInfo)
 

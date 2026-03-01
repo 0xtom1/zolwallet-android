@@ -15,7 +15,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun PayScreen() {
+fun PayScreen(showBottomBar: Boolean = true) {
     val vm = koinViewModel<PayVM>()
     val balanceVM =
         koinViewModel<BalanceWidgetVM> {
@@ -32,7 +32,12 @@ fun PayScreen() {
     val balanceState by balanceVM.state.collectAsStateWithLifecycle()
     val appBarState by appBarVM.state.collectAsStateWithLifecycle()
     val cancelState by vm.cancelState.collectAsStateWithLifecycle()
-    state?.let { PayView(it, balanceState, appBarState, bottomBar = { ZolBottomNavBarForTab(BottomNavTab.PAY) }) }
+    state?.let {
+        PayView(
+            it, balanceState, appBarState,
+            bottomBar = if (showBottomBar) ({ ZolBottomNavBarForTab(BottomNavTab.PAY) }) else ({})
+        )
+    }
     BackHandler(state != null) { state?.onBack?.invoke() }
     SwapCancelView(cancelState)
 }

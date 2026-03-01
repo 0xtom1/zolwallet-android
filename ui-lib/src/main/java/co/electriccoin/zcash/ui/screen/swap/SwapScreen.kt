@@ -10,14 +10,14 @@ import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SwapScreen() {
+fun SwapScreen(showBottomBar: Boolean = true) {
     val vm = koinViewModel<SwapVM>()
     val state by vm.state.collectAsStateWithLifecycle()
     val cancelState by vm.cancelState.collectAsStateWithLifecycle()
     state?.let {
         SwapView(
             state = it,
-            bottomBar = { ZolBottomNavBarForTab(BottomNavTab.BRIDGE) },
+            bottomBar = if (showBottomBar) ({ ZolBottomNavBarForTab(BottomNavTab.BRIDGE) }) else ({}),
         )
     }
     BackHandler(state != null) { state?.onBack?.invoke() }
