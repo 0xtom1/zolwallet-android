@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
+import co.electriccoin.zcash.ui.common.usecase.SolanaWalletContactSyncUseCase
 import xyz.zolapp.solana.model.SplTokenInfo
 import xyz.zolapp.solana.repository.SolanaRepository
 import java.text.NumberFormat
@@ -27,6 +28,7 @@ class TokenListVM(
     exchangeRateRepository: ExchangeRateRepository,
     private val solanaRepository: SolanaRepository,
     private val solanaWalletDataSource: SolanaWalletDataSource,
+    @Suppress("unused") walletContactSync: SolanaWalletContactSyncUseCase,
 ) : ViewModel() {
 
     init {
@@ -62,6 +64,7 @@ class TokenListVM(
         solTokenInfo: SplTokenInfo?,
         splTokens: List<SplTokenInfo>,
     ): TokenListState {
+        val showUsd = exchangeRateState !is ExchangeRateState.OptedOut
         val tokens = mutableListOf<TokenRowState>()
         var totalUsd = 0.0
         var hasAnyPrice = false
@@ -69,7 +72,7 @@ class TokenListVM(
         // ZEC always first
         val zecAmount = zecBalance.value.toDouble() / ZATOSHI_PER_ZEC
         val zecPrice = (exchangeRateState as? ExchangeRateState.Data)?.currencyConversion?.priceOfZec
-        val zecUsd = if (zecPrice != null) {
+        val zecUsd = if (showUsd && zecPrice != null) {
             hasAnyPrice = true
             zecAmount * zecPrice
         } else {
@@ -91,7 +94,7 @@ class TokenListVM(
 
         // SOL always second
         if (solTokenInfo != null) {
-            val solUsd = solTokenInfo.valueUsd
+            val solUsd = if (showUsd) solTokenInfo.valueUsd else null
             if (solUsd != null) {
                 hasAnyPrice = true
                 totalUsd += solUsd
@@ -112,7 +115,7 @@ class TokenListVM(
         // SPL tokens sorted by USD value descending
         val sortedSpl = splTokens.sortedByDescending { it.valueUsd ?: 0.0 }
         for (token in sortedSpl) {
-            val tokenUsd = token.valueUsd
+            val tokenUsd = if (showUsd) token.valueUsd else null
             if (tokenUsd != null) {
                 hasAnyPrice = true
                 totalUsd += tokenUsd
@@ -132,7 +135,7 @@ class TokenListVM(
 
         return TokenListState(
             tokens = tokens,
-            totalPortfolioUsd = if (hasAnyPrice) formatUsd(totalUsd) else null,
+            totalPortfolioUsd = if (!showUsd) "-" else if (hasAnyPrice) formatUsd(totalUsd) else null,
             isLoading = false,
         )
     }
