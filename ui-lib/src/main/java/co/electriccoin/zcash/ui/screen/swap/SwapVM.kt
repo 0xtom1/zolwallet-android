@@ -12,6 +12,7 @@ import co.electriccoin.zcash.ui.common.model.WalletAccount
 import co.electriccoin.zcash.ui.common.repository.EnhancedABContact
 import co.electriccoin.zcash.ui.common.repository.SwapAssetsData
 import co.electriccoin.zcash.ui.common.repository.SwapRepository
+import co.electriccoin.zcash.ui.common.datasource.SolanaWalletDataSource
 import co.electriccoin.zcash.ui.common.usecase.CancelSwapUseCase
 import co.electriccoin.zcash.ui.common.usecase.GetSelectedSwapAssetUseCase
 import co.electriccoin.zcash.ui.common.usecase.GetSelectedWalletAccountUseCase
@@ -37,6 +38,7 @@ import co.electriccoin.zcash.ui.screen.swap.info.SwapRefundAddressInfoArgs
 import co.electriccoin.zcash.ui.screen.swap.picker.SwapAssetPickerArgs
 import co.electriccoin.zcash.ui.screen.swap.slippage.SwapSlippageArgs
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -45,6 +47,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import xyz.zolapp.solana.repository.SolanaRepository
 import java.math.BigDecimal
 
 @Suppress("TooManyFunctions")
@@ -54,6 +57,8 @@ internal class SwapVM(
     getSwapAssetsUseCase: GetSwapAssetsUseCase,
     getSelectedWalletAccount: GetSelectedWalletAccountUseCase,
     preselectSwapAsset: PreselectSwapAssetUseCase,
+    private val solanaWalletDataSource: SolanaWalletDataSource,
+    private val solanaRepository: SolanaRepository,
     private val swapRepository: SwapRepository,
     private val navigateToSwapInfo: NavigateToSwapInfoUseCase,
     private val cancelSwap: CancelSwapUseCase,
@@ -64,7 +69,7 @@ internal class SwapVM(
     private val navigateToScanAddress: NavigateToScanGenericAddressUseCase,
     private val navigateToSelectSwapRecipient: NavigateToSelectABSwapRecipientUseCase,
 ) : ViewModel() {
-    private val mode = MutableStateFlow(SWAP_INTO_ZEC)
+    private val mode = MutableStateFlow(SWAP_FROM_ZEC)
 
     private val currencyType: MutableStateFlow<CurrencyType> = MutableStateFlow(CurrencyType.TOKEN)
 
@@ -162,6 +167,16 @@ internal class SwapVM(
         preselectSwapAsset
             .observe()
             .launchIn(viewModelScope)
+
+        // Auto-populate the address with the user's selected Solana address
+        viewModelScope.launch {
+            solanaWalletDataSource.selectedAccountIndex.collectLatest { index ->
+                if (mode.value == SWAP_FROM_ZEC && addressText.value.isBlank() && selectedContact.value == null) {
+                    val address = solanaRepository.getAddress(index)
+                    addressText.update { address }
+                }
+            }
+        }
     }
 
     private fun createState(innerState: InternalStateImpl): SwapState =

@@ -79,7 +79,8 @@ class WalletsVM(
 
     private fun onCreateWallet(name: String) {
         viewModelScope.launch {
-            walletDataSource.createWallet(name)
+            val newIndex = walletDataSource.createWallet(name) ?: return@launch
+            solanaRepository.fetchTokenData(newIndex)
         }
     }
 

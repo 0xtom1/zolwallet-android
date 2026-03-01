@@ -32,18 +32,20 @@ class SolanaWalletDataSource(
                 initialValue = 0,
             )
 
-    suspend fun createWallet(name: String) {
+    suspend fun createWallet(name: String): Int? {
         val current = storageProvider.get()
-        if (current.wallets.size >= SolanaWalletConfig.MAX_WALLETS) return
+        if (current.wallets.size >= SolanaWalletConfig.MAX_WALLETS) return null
 
         val nextIndex = (current.wallets.maxOfOrNull { it.accountIndex } ?: -1) + 1
         val updated = current.copy(
             wallets = current.wallets + SolanaWalletEntry(
                 accountIndex = nextIndex,
                 name = name,
-            )
+            ),
+            selectedAccountIndex = nextIndex,
         )
         storageProvider.store(updated)
+        return nextIndex
     }
 
     suspend fun renameWallet(accountIndex: Int, newName: String) {

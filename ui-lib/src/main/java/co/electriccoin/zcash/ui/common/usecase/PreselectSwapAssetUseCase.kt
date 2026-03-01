@@ -45,7 +45,7 @@ class PreselectSwapAssetUseCase(
 
     private fun getHardCodedAsset(): SimpleSwapAsset =
         simpleSwapAssetProvider
-            .get(tokenTicker = "usdc", chainTicker = "near")
+            .get(tokenTicker = "sol", chainTicker = "sol")
 
     private suspend fun getAssetFromHistory(): SimpleSwapAsset? =
         metadataRepository
