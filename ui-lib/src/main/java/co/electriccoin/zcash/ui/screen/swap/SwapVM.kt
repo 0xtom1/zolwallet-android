@@ -11,6 +11,7 @@ import co.electriccoin.zcash.ui.common.model.SwapMode
 import co.electriccoin.zcash.ui.common.model.WalletAccount
 import co.electriccoin.zcash.ui.common.repository.EnhancedABContact
 import co.electriccoin.zcash.ui.common.repository.SwapAssetsData
+import co.electriccoin.zcash.ui.common.repository.AddressBookRepository
 import co.electriccoin.zcash.ui.common.repository.SwapRepository
 import co.electriccoin.zcash.ui.common.datasource.SolanaWalletDataSource
 import co.electriccoin.zcash.ui.common.usecase.CancelSwapUseCase
@@ -39,6 +40,7 @@ import co.electriccoin.zcash.ui.screen.swap.picker.SwapAssetPickerArgs
 import co.electriccoin.zcash.ui.screen.swap.slippage.SwapSlippageArgs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.WhileSubscribed
@@ -59,6 +61,7 @@ internal class SwapVM(
     preselectSwapAsset: PreselectSwapAssetUseCase,
     private val solanaWalletDataSource: SolanaWalletDataSource,
     private val solanaRepository: SolanaRepository,
+    private val addressBookRepository: AddressBookRepository,
     private val swapRepository: SwapRepository,
     private val navigateToSwapInfo: NavigateToSwapInfoUseCase,
     private val cancelSwap: CancelSwapUseCase,
@@ -168,12 +171,17 @@ internal class SwapVM(
             .observe()
             .launchIn(viewModelScope)
 
-        // Auto-populate the address with the user's selected Solana address
+        // Auto-populate with the user's selected Solana wallet contact
         viewModelScope.launch {
             solanaWalletDataSource.selectedAccountIndex.collectLatest { index ->
                 if (mode.value == SWAP_FROM_ZEC && addressText.value.isBlank() && selectedContact.value == null) {
                     val address = solanaRepository.getAddress(index)
-                    addressText.update { address }
+                    val contact = addressBookRepository.observeContactByAddress(address).firstOrNull()
+                    if (contact != null) {
+                        selectedContact.update { contact }
+                    } else {
+                        addressText.update { address }
+                    }
                 }
             }
         }
