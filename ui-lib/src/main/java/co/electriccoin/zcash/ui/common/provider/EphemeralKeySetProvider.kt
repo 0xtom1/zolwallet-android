@@ -97,11 +97,31 @@ private fun String?.decode(): EphemeralAddress? =
     }
 
 private fun List<EphemeralAddress>.encodeList(): String? =
-    if (isEmpty()) null else joinToString(";") { "${it.address}.${it.gapPosition}.${it.gapLimit}" }
+    if (isEmpty()) {
+        null
+    } else {
+        joinToString(";") {
+            val safeName = it.name.replace(";", "").replace("|", "")
+            "${it.address}|${it.gapPosition}|${it.gapLimit}|$safeName"
+        }
+    }
 
 private fun String?.decodeList(): List<EphemeralAddress> =
     if (this.isNullOrEmpty()) {
         emptyList()
     } else {
-        split(";").mapNotNull { it.decode() }
+        split(";").mapNotNull { entry ->
+            val parts = entry.split("|")
+            if (parts.size >= 3) {
+                EphemeralAddress(
+                    address = parts[0],
+                    gapPosition = parts[1].toUIntOrNull() ?: return@mapNotNull null,
+                    gapLimit = parts[2].toUIntOrNull() ?: return@mapNotNull null,
+                    name = parts.getOrElse(3) { "" },
+                )
+            } else {
+                // Backward compat: try old dot-separated format without name
+                entry.decode()
+            }
+        }
     }

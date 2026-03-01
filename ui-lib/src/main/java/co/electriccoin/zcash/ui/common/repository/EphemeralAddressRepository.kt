@@ -17,13 +17,15 @@ interface EphemeralAddressRepository {
 
     suspend fun get(): EphemeralAddress?
 
-    suspend fun create(): EphemeralAddress
+    suspend fun create(name: String = ""): EphemeralAddress
 
     suspend fun invalidate()
 
     fun observeAll(): Flow<List<EphemeralAddress>>
 
     suspend fun getAll(): List<EphemeralAddress>
+
+    suspend fun rename(address: String, newName: String)
 }
 
 class EphemeralAddressRepositoryImpl(
@@ -72,7 +74,7 @@ class EphemeralAddressRepositoryImpl(
         return ephemeralAddressStorageProvider.getAll(account.sdkAccount.accountUuid)
     }
 
-    override suspend fun create(): EphemeralAddress {
+    override suspend fun create(name: String): EphemeralAddress {
         val account = accountDataSource.getSelectedAccount()
         val uuid = account.sdkAccount.accountUuid
         val new =
@@ -83,7 +85,8 @@ class EphemeralAddressRepositoryImpl(
                     EphemeralAddress(
                         address = it.address,
                         gapPosition = it.gapPosition,
-                        gapLimit = it.gapLimit
+                        gapLimit = it.gapLimit,
+                        name = name
                     )
                 }
 
@@ -95,5 +98,13 @@ class EphemeralAddressRepositoryImpl(
         ephemeralAddressStorageProvider.storeAll(uuid, all + new)
 
         return new
+    }
+
+    override suspend fun rename(address: String, newName: String) {
+        val account = accountDataSource.getSelectedAccount()
+        val uuid = account.sdkAccount.accountUuid
+        val all = ephemeralAddressStorageProvider.getAll(uuid)
+        val updated = all.map { if (it.address == address) it.copy(name = newName) else it }
+        ephemeralAddressStorageProvider.storeAll(uuid, updated)
     }
 }

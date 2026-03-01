@@ -4,4 +4,5 @@ data class EphemeralAddress(
     val address: String,
     val gapPosition: UInt,
     val gapLimit: UInt,
+    val name: String = "",
 )

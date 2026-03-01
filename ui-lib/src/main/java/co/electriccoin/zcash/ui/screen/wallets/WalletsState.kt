@@ -11,6 +11,7 @@ data class WalletsState(
     val onBack: () -> Unit,
     val ephemeralAddresses: List<EphemeralAddressItemState> = emptyList(),
     val onCreateEphemeral: () -> Unit = {},
+    val onCreateEphemeralNamed: (name: String) -> Unit = {},
 )
 
 @Immutable
@@ -28,4 +29,6 @@ data class WalletItemState(
 data class EphemeralAddressItemState(
     val address: String,
     val addressShort: String,
+    val name: String,
+    val onRename: (newName: String) -> Unit,
 )

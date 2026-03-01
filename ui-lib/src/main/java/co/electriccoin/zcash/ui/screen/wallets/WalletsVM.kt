@@ -26,10 +26,12 @@ class WalletsVM(
             walletDataSource.config,
             ephemeralAddressRepository.observeAll(),
         ) { config, ephemeralAddresses ->
-            createState(config, ephemeralAddresses.map { addr ->
+            createState(config, ephemeralAddresses.mapIndexed { index, addr ->
                 EphemeralAddressItemState(
                     address = addr.address,
                     addressShort = shortenAddress(addr.address),
+                    name = addr.name.ifEmpty { "Address ${index + 1}" },
+                    onRename = { newName -> onRenameEphemeral(addr.address, newName) },
                 )
             })
         }.stateIn(
@@ -43,6 +45,7 @@ class WalletsVM(
                 onBack = ::onBack,
                 ephemeralAddresses = emptyList(),
                 onCreateEphemeral = ::onCreateEphemeral,
+                onCreateEphemeralNamed = ::onCreateEphemeralNamed,
             )
         )
 
@@ -70,6 +73,7 @@ class WalletsVM(
             onBack = ::onBack,
             ephemeralAddresses = ephemeralItems,
             onCreateEphemeral = ::onCreateEphemeral,
+            onCreateEphemeralNamed = ::onCreateEphemeralNamed,
         )
     }
 
@@ -94,13 +98,31 @@ class WalletsVM(
 
     private fun onCreateEphemeral() {
         viewModelScope.launch {
-            ephemeralAddressRepository.create()
+            val name = nextDefaultEphemeralName()
+            ephemeralAddressRepository.create(name)
+        }
+    }
+
+    private fun onCreateEphemeralNamed(name: String) {
+        viewModelScope.launch {
+            ephemeralAddressRepository.create(name)
+        }
+    }
+
+    private fun onRenameEphemeral(address: String, newName: String) {
+        viewModelScope.launch {
+            ephemeralAddressRepository.rename(address, newName)
         }
     }
 
     private fun onBack() = navigationRouter.back()
 
     fun nextDefaultName(): String = walletDataSource.nextDefaultName()
+
+    fun nextDefaultEphemeralName(): String {
+        val count = state.value.ephemeralAddresses.size
+        return "Address ${count + 1}"
+    }
 
     companion object {
         private fun shortenAddress(address: String): String =

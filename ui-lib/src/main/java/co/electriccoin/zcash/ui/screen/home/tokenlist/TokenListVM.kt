@@ -64,7 +64,7 @@ class TokenListVM(
         solTokenInfo: SplTokenInfo?,
         splTokens: List<SplTokenInfo>,
     ): TokenListState {
-        val showUsd = exchangeRateState !is ExchangeRateState.OptedOut
+        val showUsd = exchangeRateState is ExchangeRateState.Data
         val tokens = mutableListOf<TokenRowState>()
         var totalUsd = 0.0
         var hasAnyPrice = false
@@ -135,7 +135,7 @@ class TokenListVM(
 
         return TokenListState(
             tokens = tokens,
-            totalPortfolioUsd = if (!showUsd) "-" else if (hasAnyPrice) formatUsd(totalUsd) else null,
+            totalPortfolioUsd = if (!showUsd) null else if (hasAnyPrice) formatUsd(totalUsd) else null,
             isLoading = false,
         )
     }
