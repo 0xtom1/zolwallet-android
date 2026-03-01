@@ -13,9 +13,9 @@ data class ZolBottomNavBarState(
 )
 
 enum class BottomNavTab {
-    PORTFOLIO,
     WALLETS,
     BRIDGE,
+    PORTFOLIO,
     SWAP,
     PAY,
 }

@@ -23,13 +23,6 @@ fun ZolBottomNavBar(state: ZolBottomNavBarState) {
         containerColor = ZashiColors.Surfaces.bgPrimary,
     ) {
         NavigationBarItem(
-            selected = state.selectedTab == BottomNavTab.PORTFOLIO,
-            onClick = state.onPortfolioClick,
-            icon = { Icon(painterResource(R.drawable.ic_nav_portfolio), contentDescription = null) },
-            label = { Text("Portfolio") },
-            colors = navItemColors(),
-        )
-        NavigationBarItem(
             selected = state.selectedTab == BottomNavTab.WALLETS,
             onClick = state.onWalletsClick,
             icon = { Icon(painterResource(R.drawable.ic_nav_wallets), contentDescription = null) },
@@ -41,6 +34,13 @@ fun ZolBottomNavBar(state: ZolBottomNavBarState) {
             onClick = state.onBridgeClick,
             icon = { Icon(painterResource(R.drawable.ic_nav_bridge), contentDescription = null) },
             label = { Text("Bridge") },
+            colors = navItemColors(),
+        )
+        NavigationBarItem(
+            selected = state.selectedTab == BottomNavTab.PORTFOLIO,
+            onClick = state.onPortfolioClick,
+            icon = { Icon(painterResource(R.drawable.ic_nav_portfolio), contentDescription = null) },
+            label = { Text("Portfolio") },
             colors = navItemColors(),
         )
         NavigationBarItem(

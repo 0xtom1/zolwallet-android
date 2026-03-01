@@ -28,14 +28,14 @@ private val TABS = BottomNavTab.entries.toList()
 
 @Composable
 fun TabHostScreen() {
-    val pagerState = rememberPagerState(pageCount = { TABS.size })
+    val pagerState = rememberPagerState(initialPage = 2, pageCount = { TABS.size })
     val scope = rememberCoroutineScope()
 
     val currentPage = pagerState.currentPage
     val selectedTab = TABS[currentPage]
 
-    BackHandler(enabled = currentPage != 0) {
-        scope.launch { pagerState.animateScrollToPage(0) }
+    BackHandler(enabled = currentPage != 2) {
+        scope.launch { pagerState.animateScrollToPage(2) }
     }
 
     BlankBgScaffold(
@@ -43,9 +43,9 @@ fun TabHostScreen() {
             ZolBottomNavBar(
                 ZolBottomNavBarState(
                     selectedTab = selectedTab,
-                    onPortfolioClick = { scope.launch { pagerState.animateScrollToPage(0) } },
-                    onWalletsClick = { scope.launch { pagerState.animateScrollToPage(1) } },
-                    onBridgeClick = { scope.launch { pagerState.animateScrollToPage(2) } },
+                    onWalletsClick = { scope.launch { pagerState.animateScrollToPage(0) } },
+                    onBridgeClick = { scope.launch { pagerState.animateScrollToPage(1) } },
+                    onPortfolioClick = { scope.launch { pagerState.animateScrollToPage(2) } },
                     onSwapClick = { scope.launch { pagerState.animateScrollToPage(3) } },
                     onPayClick = { scope.launch { pagerState.animateScrollToPage(4) } },
                 )
@@ -63,9 +63,9 @@ fun TabHostScreen() {
                     .padding(bottom = paddingValues.calculateBottomPadding())
             ) {
                 when (page) {
-                    0 -> AndroidHome()
-                    1 -> WalletsScreen(showBottomBar = false)
-                    2 -> SwapScreen(showBottomBar = false)
+                    0 -> WalletsScreen(showBottomBar = false)
+                    1 -> SwapScreen(showBottomBar = false)
+                    2 -> AndroidHome()
                     3 -> ComingSoonContent()
                     4 -> PayScreen(showBottomBar = false)
                 }
