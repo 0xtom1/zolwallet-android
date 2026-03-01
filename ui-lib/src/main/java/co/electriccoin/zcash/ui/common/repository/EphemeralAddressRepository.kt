@@ -20,6 +20,10 @@ interface EphemeralAddressRepository {
     suspend fun create(): EphemeralAddress
 
     suspend fun invalidate()
+
+    fun observeAll(): Flow<List<EphemeralAddress>>
+
+    suspend fun getAll(): List<EphemeralAddress>
 }
 
 class EphemeralAddressRepositoryImpl(
@@ -38,6 +42,17 @@ class EphemeralAddressRepositoryImpl(
                 if (uuid != null) ephemeralAddressStorageProvider.observe(uuid) else flowOf(null)
             }.distinctUntilChanged()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun observeAll(): Flow<List<EphemeralAddress>> =
+        accountDataSource
+            .selectedAccount
+            .map {
+                it?.sdkAccount?.accountUuid
+            }.distinctUntilChanged()
+            .flatMapLatest { uuid ->
+                if (uuid != null) ephemeralAddressStorageProvider.observeAll(uuid) else flowOf(emptyList())
+            }.distinctUntilChanged()
+
     override suspend fun invalidate() {
         val account = accountDataSource.getSelectedAccount()
         val existing = ephemeralAddressStorageProvider.get(account.sdkAccount.accountUuid)
@@ -52,12 +67,18 @@ class EphemeralAddressRepositoryImpl(
         return ephemeralAddressStorageProvider.get(account.sdkAccount.accountUuid)
     }
 
+    override suspend fun getAll(): List<EphemeralAddress> {
+        val account = accountDataSource.getSelectedAccount()
+        return ephemeralAddressStorageProvider.getAll(account.sdkAccount.accountUuid)
+    }
+
     override suspend fun create(): EphemeralAddress {
         val account = accountDataSource.getSelectedAccount()
+        val uuid = account.sdkAccount.accountUuid
         val new =
             synchronizerProvider
                 .getSynchronizer()
-                .getSingleUseTransparentAddress(account.sdkAccount.accountUuid)
+                .getSingleUseTransparentAddress(uuid)
                 .let {
                     EphemeralAddress(
                         address = it.address,
@@ -67,7 +88,12 @@ class EphemeralAddressRepositoryImpl(
                 }
 
         Twig.debug { "Generated new ephemeral address: $new" }
-        ephemeralAddressStorageProvider.store(account.sdkAccount.accountUuid, new)
+        ephemeralAddressStorageProvider.store(uuid, new)
+
+        // Also append to the list
+        val all = ephemeralAddressStorageProvider.getAll(uuid)
+        ephemeralAddressStorageProvider.storeAll(uuid, all + new)
+
         return new
     }
 }

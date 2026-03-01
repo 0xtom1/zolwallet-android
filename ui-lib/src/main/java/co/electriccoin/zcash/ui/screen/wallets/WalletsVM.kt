@@ -6,10 +6,11 @@ import cash.z.ecc.sdk.ANDROID_STATE_FLOW_TIMEOUT
 import co.electriccoin.zcash.ui.NavigationRouter
 import co.electriccoin.zcash.ui.common.datasource.SolanaWalletDataSource
 import co.electriccoin.zcash.ui.common.model.SolanaWalletConfig
+import co.electriccoin.zcash.ui.common.repository.EphemeralAddressRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import xyz.zolapp.solana.repository.SolanaRepository
@@ -18,23 +19,37 @@ class WalletsVM(
     private val walletDataSource: SolanaWalletDataSource,
     private val solanaRepository: SolanaRepository,
     private val navigationRouter: NavigationRouter,
+    private val ephemeralAddressRepository: EphemeralAddressRepository,
 ) : ViewModel() {
     val state: StateFlow<WalletsState> =
-        walletDataSource.config
-            .map { config -> createState(config) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(ANDROID_STATE_FLOW_TIMEOUT),
-                initialValue = WalletsState(
-                    wallets = emptyList(),
-                    canCreateMore = true,
-                    isLoading = true,
-                    onCreate = ::onCreateWallet,
-                    onBack = ::onBack,
+        combine(
+            walletDataSource.config,
+            ephemeralAddressRepository.observeAll(),
+        ) { config, ephemeralAddresses ->
+            createState(config, ephemeralAddresses.map { addr ->
+                EphemeralAddressItemState(
+                    address = addr.address,
+                    addressShort = shortenAddress(addr.address),
                 )
+            })
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(ANDROID_STATE_FLOW_TIMEOUT),
+            initialValue = WalletsState(
+                wallets = emptyList(),
+                canCreateMore = true,
+                isLoading = true,
+                onCreate = ::onCreateWallet,
+                onBack = ::onBack,
+                ephemeralAddresses = emptyList(),
+                onCreateEphemeral = ::onCreateEphemeral,
             )
+        )
 
-    private suspend fun createState(config: SolanaWalletConfig): WalletsState {
+    private suspend fun createState(
+        config: SolanaWalletConfig,
+        ephemeralItems: List<EphemeralAddressItemState>
+    ): WalletsState {
         val items = config.wallets.map { entry ->
             val address = solanaRepository.getAddress(entry.accountIndex)
             WalletItemState(
@@ -53,6 +68,8 @@ class WalletsVM(
             isLoading = false,
             onCreate = ::onCreateWallet,
             onBack = ::onBack,
+            ephemeralAddresses = ephemeralItems,
+            onCreateEphemeral = ::onCreateEphemeral,
         )
     }
 
@@ -72,6 +89,12 @@ class WalletsVM(
         viewModelScope.launch {
             walletDataSource.selectWallet(accountIndex)
             solanaRepository.fetchTokenData(accountIndex)
+        }
+    }
+
+    private fun onCreateEphemeral() {
+        viewModelScope.launch {
+            ephemeralAddressRepository.create()
         }
     }
 

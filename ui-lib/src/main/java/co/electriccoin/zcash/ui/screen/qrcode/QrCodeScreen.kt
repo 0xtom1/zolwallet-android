@@ -10,8 +10,8 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-internal fun QrCodeScreen(addressType: Int) {
-    val vm = koinViewModel<QrCodeVM> { parametersOf(addressType) }
+internal fun QrCodeScreen(addressType: Int, addressOverride: String? = null) {
+    val vm = koinViewModel<QrCodeVM> { parametersOf(addressType, addressOverride) }
     val qrCodeState by vm.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     BackHandler {

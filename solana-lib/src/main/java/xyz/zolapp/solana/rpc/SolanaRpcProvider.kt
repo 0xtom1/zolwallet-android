@@ -138,6 +138,7 @@ class SolanaRpcProvider(
 
     companion object {
         const val MAINNET_RPC_URL = "https://wallet-api-5arl64l7ia-uc.a.run.app/helius"
+        const val DEVNET_RPC_URL = "https://api.devnet.solana.com"
         private const val SOL_DECIMALS = 9
     }
 }

@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -220,45 +223,60 @@ private fun AddressPanel(
         }
 
         AnimatedVisibility(visible = state.isExpanded) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = ZcashTheme.dimens.spacingDefault)
-            ) {
-                if (state.showCopy) {
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = ZcashTheme.dimens.spacingDefault)
+                ) {
+                    if (state.showCopy) {
+                        ReceiveIconButton(
+                            containerColor = buttonColor,
+                            contentColor = buttonTextColor,
+                            iconPainter = painterResource(id = R.drawable.ic_copy_shielded),
+                            onClick = state.onCopyClicked,
+                            text = stringResource(id = R.string.receive_copy),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Spacer(modifier = Modifier.width(ZcashTheme.dimens.spacingSmall))
+                    }
+
                     ReceiveIconButton(
                         containerColor = buttonColor,
                         contentColor = buttonTextColor,
-                        iconPainter = painterResource(id = R.drawable.ic_copy_shielded),
-                        onClick = state.onCopyClicked,
-                        text = stringResource(id = R.string.receive_copy),
+                        iconPainter = painterResource(id = R.drawable.ic_qr_code_shielded),
+                        onClick = state.onQrClicked,
+                        text = stringResource(id = R.string.receive_qr_code),
                         modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(modifier = Modifier.width(ZcashTheme.dimens.spacingSmall))
+                    if (state.showRequest) {
+                        Spacer(modifier = Modifier.width(ZcashTheme.dimens.spacingSmall))
+
+                        ReceiveIconButton(
+                            containerColor = buttonColor,
+                            contentColor = buttonTextColor,
+                            iconPainter = painterResource(id = R.drawable.ic_request_shielded),
+                            onClick = state.onRequestClicked,
+                            text = stringResource(id = R.string.receive_request),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
 
-                ReceiveIconButton(
-                    containerColor = buttonColor,
-                    contentColor = buttonTextColor,
-                    iconPainter = painterResource(id = R.drawable.ic_qr_code_shielded),
-                    onClick = state.onQrClicked,
-                    text = stringResource(id = R.string.receive_qr_code),
-                    modifier = Modifier.weight(1f)
-                )
-
-                if (state.showRequest) {
-                    Spacer(modifier = Modifier.width(ZcashTheme.dimens.spacingSmall))
+                if (state.onGenerateNewClicked != null) {
+                    Spacer(Modifier.height(8.dp))
 
                     ReceiveIconButton(
                         containerColor = buttonColor,
                         contentColor = buttonTextColor,
-                        iconPainter = painterResource(id = R.drawable.ic_request_shielded),
-                        onClick = state.onRequestClicked,
-                        text = stringResource(id = R.string.receive_request),
-                        modifier = Modifier.weight(1f)
+                        iconPainter = rememberVectorPainter(Icons.Default.Refresh),
+                        onClick = state.onGenerateNewClicked,
+                        text = stringResource(id = R.string.receive_generate_new),
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

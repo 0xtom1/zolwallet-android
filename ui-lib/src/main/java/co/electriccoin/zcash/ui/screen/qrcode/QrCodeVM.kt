@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 class QrCodeVM(
     observeSelectedWalletAccount: ObserveSelectedWalletAccountUseCase,
     private val addressTypeOrdinal: Int,
+    private val addressOverride: String?,
     private val copyToClipboard: CopyToClipboardUseCase,
     private val navigationRouter: NavigationRouter,
     private val shareQR: ShareQRUseCase,
@@ -33,7 +34,12 @@ class QrCodeVM(
         observeSelectedWalletAccount
             .require()
             .map { account ->
-                val walletAddress = account.fromReceiveAddressType(ReceiveAddressType.fromOrdinal(addressTypeOrdinal))
+                val walletAddress =
+                    if (addressOverride != null) {
+                        WalletAddress.Transparent.new(addressOverride)
+                    } else {
+                        account.fromReceiveAddressType(ReceiveAddressType.fromOrdinal(addressTypeOrdinal))
+                    }
 
                 if (walletAddress == null) {
                     QrCodeState.Loading

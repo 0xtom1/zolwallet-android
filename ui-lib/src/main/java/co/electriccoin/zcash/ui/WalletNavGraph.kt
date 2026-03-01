@@ -219,20 +219,28 @@ fun NavGraphBuilder.walletNavGraph(
         composable<SelectABRecipientArgs> { SelectABRecipientScreen() }
         composable<AddZashiABContactArgs> { AddZashiABContactScreen(it.toRoute()) }
         composable(
-            route = "${NavigationTargets.QR_CODE}/{${NavigationArgs.ADDRESS_TYPE}}",
-            arguments = listOf(navArgument(NavigationArgs.ADDRESS_TYPE) { type = NavType.Companion.IntType })
+            route = "${NavigationTargets.QR_CODE}/{${NavigationArgs.ADDRESS_TYPE}}?address={address}",
+            arguments = listOf(
+                navArgument(NavigationArgs.ADDRESS_TYPE) { type = NavType.Companion.IntType },
+                navArgument("address") { type = NavType.Companion.StringType; nullable = true; defaultValue = null }
+            )
         ) { backStackEntry ->
             val addressType =
                 backStackEntry.arguments?.getInt(NavigationArgs.ADDRESS_TYPE) ?: ReceiveAddressType.Unified.ordinal
-            QrCodeScreen(addressType)
+            val addressOverride = backStackEntry.arguments?.getString("address")
+            QrCodeScreen(addressType, addressOverride)
         }
         composable(
-            route = "${NavigationTargets.REQUEST}/{${NavigationArgs.ADDRESS_TYPE}}",
-            arguments = listOf(navArgument(NavigationArgs.ADDRESS_TYPE) { type = NavType.Companion.IntType })
+            route = "${NavigationTargets.REQUEST}/{${NavigationArgs.ADDRESS_TYPE}}?address={address}",
+            arguments = listOf(
+                navArgument(NavigationArgs.ADDRESS_TYPE) { type = NavType.Companion.IntType },
+                navArgument("address") { type = NavType.Companion.StringType; nullable = true; defaultValue = null }
+            )
         ) { backStackEntry ->
             val addressType =
                 backStackEntry.arguments?.getInt(NavigationArgs.ADDRESS_TYPE) ?: ReceiveAddressType.Unified.ordinal
-            RequestScreen(addressType)
+            val addressOverride = backStackEntry.arguments?.getString("address")
+            RequestScreen(addressType, addressOverride)
         }
         composable<ConnectKeystone> { AndroidConnectKeystone() }
         composable<SelectKeystoneAccount> { AndroidSelectKeystoneAccount(it.toRoute()) }

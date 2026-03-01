@@ -21,10 +21,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,37 +52,51 @@ data object WalletsArgs
 fun WalletsScreen(viewModel: WalletsVM = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    var selectedTab by remember { mutableIntStateOf(0) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<WalletItemState?>(null) }
 
     BlankBgScaffold(
         topBar = {
-            ZashiSmallTopAppBar(title = "Wallets")
+            Column {
+                ZashiSmallTopAppBar(title = "Wallets")
+                TabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = ZashiColors.Surfaces.bgPrimary,
+                    contentColor = ZashiColors.Text.textPrimary,
+                ) {
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0 },
+                        text = { Text("Solana") },
+                    )
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
+                        text = { Text("Zcash") },
+                    )
+                }
+            }
         },
         bottomBar = { ZolBottomNavBarForTab(BottomNavTab.WALLETS) }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-        ) {
-            items(
-                items = state.wallets,
-                key = { it.accountIndex },
-            ) { wallet ->
-                WalletRow(
-                    wallet = wallet,
-                    onRenameClick = { renameTarget = wallet },
-                )
-                HorizontalDivider(color = ZashiColors.Surfaces.bgSecondary)
-            }
-
-            if (state.canCreateMore) {
-                item {
-                    CreateWalletRow(onClick = { showCreateDialog = true })
-                }
-            }
+        when (selectedTab) {
+            0 -> SolanaTabContent(
+                state = state,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
+                onCreateClick = { showCreateDialog = true },
+                onRenameClick = { renameTarget = it },
+            )
+            1 -> ZcashTabContent(
+                state = state,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
+            )
         }
     }
 
@@ -105,6 +122,87 @@ fun WalletsScreen(viewModel: WalletsVM = koinViewModel()) {
             },
             onDismiss = { renameTarget = null },
         )
+    }
+}
+
+@Composable
+private fun SolanaTabContent(
+    state: WalletsState,
+    modifier: Modifier = Modifier,
+    onCreateClick: () -> Unit,
+    onRenameClick: (WalletItemState) -> Unit,
+) {
+    LazyColumn(modifier = modifier) {
+        items(
+            items = state.wallets,
+            key = { it.accountIndex },
+        ) { wallet ->
+            WalletRow(
+                wallet = wallet,
+                onRenameClick = { onRenameClick(wallet) },
+            )
+            HorizontalDivider(color = ZashiColors.Surfaces.bgSecondary)
+        }
+
+        if (state.canCreateMore) {
+            item {
+                CreateRow(
+                    label = "Create Wallet",
+                    onClick = onCreateClick,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ZcashTabContent(
+    state: WalletsState,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(modifier = modifier) {
+        items(
+            items = state.ephemeralAddresses,
+            key = { it.address },
+        ) { item ->
+            EphemeralAddressRow(item = item)
+            HorizontalDivider(color = ZashiColors.Surfaces.bgSecondary)
+        }
+
+        item {
+            CreateRow(
+                label = "Create Address",
+                onClick = state.onCreateEphemeral,
+            )
+        }
+    }
+}
+
+@Composable
+private fun EphemeralAddressRow(item: EphemeralAddressItemState) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spacer(modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Ephemeral Address",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = ZashiColors.Text.textPrimary,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = item.addressShort,
+                fontSize = 13.sp,
+                color = ZashiColors.Text.textTertiary,
+            )
+        }
     }
 }
 
@@ -160,7 +258,7 @@ private fun WalletRow(
 }
 
 @Composable
-private fun CreateWalletRow(onClick: () -> Unit) {
+private fun CreateRow(label: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,7 +268,7 @@ private fun CreateWalletRow(onClick: () -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = "Create wallet",
+            contentDescription = label,
             tint = ZashiColors.Text.textTertiary,
             modifier = Modifier.size(20.dp),
         )
@@ -178,7 +276,7 @@ private fun CreateWalletRow(onClick: () -> Unit) {
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = "Create Wallet",
+            text = label,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = ZashiColors.Text.textTertiary,

@@ -26,6 +26,7 @@ data class ReceiveAddressState(
     val onCopyClicked: () -> Unit,
     val onQrClicked: () -> Unit,
     val onRequestClicked: () -> Unit,
+    val onGenerateNewClicked: (() -> Unit)? = null,
 ) {
     enum class ColorMode {
         ZASHI,

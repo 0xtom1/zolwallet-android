@@ -17,7 +17,10 @@ import xyz.zolapp.solana.usecase.ValidateSolanaAddressUseCase
 
 fun solanaModule(isTestnet: Boolean) =
     module {
-        single { SolanaRpcProvider(get<SolanaHttpClientFactory>()) }
+        single {
+            val rpcUrl = if (isTestnet) SolanaRpcProvider.DEVNET_RPC_URL else SolanaRpcProvider.MAINNET_RPC_URL
+            SolanaRpcProvider(get<SolanaHttpClientFactory>(), rpcUrl)
+        }
         singleOf(::SolanaDataSource)
         singleOf(::SolanaRepository)
         factoryOf(::GetSolanaBalanceUseCase)

@@ -9,6 +9,8 @@
     <string name="receive_qr_code">QR Code</string>
     <string name="receive_request">Request</string>
     <string name="receive_clipboard_tag">Zcash Wallet Address</string>
+    <string name="receive_wallet_address_ephemeral">Zcash Ephemeral Transparent Address</string>
+    <string name="receive_generate_new">Generate New</string>
     <string name="receive_wallet_address_shielded_keystone">Zcash Shielded Address</string>
     <string name="receive_wallet_address_sapling_keystone">Zcash Sapling Address</string>
     <string name="receive_wallet_address_transparent_keystone">Zcash Transparent Address</string>

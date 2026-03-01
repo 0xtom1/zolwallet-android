@@ -17,12 +17,19 @@ interface EphemeralAddressStorageProvider {
     suspend fun store(uuid: AccountUuid, address: EphemeralAddress)
 
     suspend fun remove(uuid: AccountUuid)
+
+    fun observeAll(uuid: AccountUuid): Flow<List<EphemeralAddress>>
+
+    suspend fun getAll(uuid: AccountUuid): List<EphemeralAddress>
+
+    suspend fun storeAll(uuid: AccountUuid, addresses: List<EphemeralAddress>)
 }
 
 class EphemeralAddressStorageProviderImpl(
     encryptedPreferenceProvider: EncryptedPreferenceProvider
 ) : EphemeralAddressStorageProvider {
     private val default = EphemeralAddressPreferenceDefault(encryptedPreferenceProvider)
+    private val listDefault = EphemeralAddressListPreferenceDefault(encryptedPreferenceProvider)
 
     override fun observe(uuid: AccountUuid) = default.observe(uuid)
 
@@ -31,6 +38,13 @@ class EphemeralAddressStorageProviderImpl(
     override suspend fun store(uuid: AccountUuid, address: EphemeralAddress) = default.putValue(address, uuid)
 
     override suspend fun remove(uuid: AccountUuid) = default.remove(uuid)
+
+    override fun observeAll(uuid: AccountUuid): Flow<List<EphemeralAddress>> = listDefault.observe(uuid)
+
+    override suspend fun getAll(uuid: AccountUuid): List<EphemeralAddress> = listDefault.getValue(uuid)
+
+    override suspend fun storeAll(uuid: AccountUuid, addresses: List<EphemeralAddress>) =
+        listDefault.putValue(addresses, uuid)
 }
 
 private class EphemeralAddressPreferenceDefault(
@@ -51,6 +65,26 @@ private class EphemeralAddressPreferenceDefault(
     private fun getKey(uuid: AccountUuid) = PreferenceKey("ephemeral_address_${uuid.value.toHexString()}")
 }
 
+private class EphemeralAddressListPreferenceDefault(
+    private val encryptedPreferenceProvider: EncryptedPreferenceProvider
+) {
+    fun observe(uuid: AccountUuid): Flow<List<EphemeralAddress>> =
+        flow {
+            emitAll(
+                encryptedPreferenceProvider().observe(key = getKey(uuid)).map { it.decodeList() }
+            )
+        }
+
+    suspend fun getValue(uuid: AccountUuid): List<EphemeralAddress> =
+        encryptedPreferenceProvider().getString(key = getKey(uuid)).decodeList()
+
+    suspend fun putValue(addresses: List<EphemeralAddress>, uuid: AccountUuid) =
+        encryptedPreferenceProvider().putString(key = getKey(uuid), value = addresses.encodeList())
+
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun getKey(uuid: AccountUuid) = PreferenceKey("ephemeral_addresses_list_${uuid.value.toHexString()}")
+}
+
 private fun EphemeralAddress?.encode(): String? = if (this == null) null else "$address.$gapPosition.$gapLimit"
 
 private fun String?.decode(): EphemeralAddress? =
@@ -60,4 +94,14 @@ private fun String?.decode(): EphemeralAddress? =
             gapPosition = it[1].toUInt(),
             gapLimit = it[2].toUInt()
         )
+    }
+
+private fun List<EphemeralAddress>.encodeList(): String? =
+    if (isEmpty()) null else joinToString(";") { "${it.address}.${it.gapPosition}.${it.gapLimit}" }
+
+private fun String?.decodeList(): List<EphemeralAddress> =
+    if (this.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        split(";").mapNotNull { it.decode() }
     }

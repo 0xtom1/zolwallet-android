@@ -42,6 +42,7 @@ import java.text.DecimalFormatSymbols
 @Suppress("TooManyFunctions")
 class RequestVM(
     private val addressTypeOrdinal: Int,
+    private val addressOverride: String?,
     private val application: Application,
     exchangeRateRepository: ExchangeRateRepository,
     getZcashCurrency: GetZcashCurrencyProvider,
@@ -91,8 +92,12 @@ class RequestVM(
             observeSelectedWalletAccount.require()
         ) { request, currentStage, exchangeRateUsd, account ->
             val walletAddress =
-                account.fromReceiveAddressType(ReceiveAddressType.fromOrdinal(addressTypeOrdinal))
-                    ?: return@combine RequestState.Loading
+                if (addressOverride != null) {
+                    WalletAddress.Transparent.new(addressOverride)
+                } else {
+                    account.fromReceiveAddressType(ReceiveAddressType.fromOrdinal(addressTypeOrdinal))
+                        ?: return@combine RequestState.Loading
+                }
 
             when (currentStage) {
                 RequestStage.AMOUNT -> {
